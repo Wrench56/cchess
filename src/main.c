@@ -1,13 +1,19 @@
 #include <ncurses.h>
+#include <locale.h>
+
+#include "menu.h"
+#include "board.h"
 
 int main()
-{	
-	initscr();
+{
+    // Support unicode //
+    setlocale(LC_ALL, "");
 
-	printw("Hello World !!!");	/* Print Hello World		  */
-	refresh();			/* Print it on to the real screen */
-	getch();			/* Wait for user input */
-	endwin();			/* End curses mode		  */
+	initscr();
+    display_menu();
+    draw_board();
+    getch();
+    endwin();
 
 	return 0;
 }
