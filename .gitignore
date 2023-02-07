@@ -1,2 +1,5 @@
 # Ignore the build folder
 /build
+
+# Ignore playground folder
+playground
