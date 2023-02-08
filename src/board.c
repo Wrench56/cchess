@@ -75,7 +75,6 @@ void draw_fen(int x, int y, char fen_table[], size_t fen_size) {
             if (char_to_process >= 'a') {
                 char_to_process -= 32;
             }
-            printf("%c", char_to_process);
     
             switch (char_to_process) {
                 case 'P': // Pawn
