@@ -15,7 +15,7 @@ int main()
 
     display_menu();
 
-    char basic_fen[] = "8/8/8/8/8/8/8/8";
+    char basic_fen[] = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
     draw_fen(0, 0, basic_fen, sizeof(basic_fen));
     getch();
