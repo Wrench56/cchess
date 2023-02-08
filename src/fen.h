@@ -3,13 +3,14 @@
 #include <stdio.h>
 
 struct FEN {
-    char piece_placement[86]; // The fen for pieces (should be 85)
-    short active_color;     // 0 for white, 1 for black
-    short castle_white;     // 0: can't castle, +1: king side, +2: queen side
-    short castle_black;     // Same
-    char en_passant[2];     // En passant target square
-    short halfmove;        // Fifty-move rule
-    int fullmove;           // Fullmoves
+    char piece_placement[86];       // The fen for pieces (should be 85)
+    short piece_placement_length;   // Length of piece_placement
+    short active_color;             // 0 for white, 1 for black
+    short castle_white;             // 0: can't castle, +1: king side, +2: queen side
+    short castle_black;             // Same
+    char en_passant[2];             // En passant target square
+    short halfmove;                 // Fifty-move rule
+    int fullmove;                   // Fullmoves
 };
 
 

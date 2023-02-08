@@ -11,12 +11,19 @@ enum FENSM {
     Castle,
     EnPassant,
     Halfmove,
-    Fullmove
+    Fullmove,
+    EndState
 };
 
 struct FEN parse_fen(char fen_string[], size_t fen_size) {
     enum FENSM FENState = PiecePlacement;
     struct FEN fen;
+    
+    // Set some defaults // 
+
+    fen.castle_white = 0;
+    fen.castle_black = 0;
+
     for (short i = 0; i < fen_size; i++) {
         switch (FENState) {
             case PiecePlacement:
@@ -24,6 +31,7 @@ struct FEN parse_fen(char fen_string[], size_t fen_size) {
                     continue;
                 }
                 memcpy(fen.piece_placement, fen_string, i);
+                fen.piece_placement_length = i;
                 FENState++;
 
                 break;
@@ -57,20 +65,27 @@ struct FEN parse_fen(char fen_string[], size_t fen_size) {
                 if (fen_string[i] != '-') {
                     strncat(fen.en_passant, &fen_string[i], 2);
                     i++;
+                } else {
+                    fen.en_passant[0] = '-';
+                    fen.en_passant[1] = '-';
                 }
                 i++;
                 FENState++;
 
                 break;
             case Halfmove:
-                fen.halfmove = (short) fen_string[i];
-
+                fen.halfmove = (short) fen_string[i] - 48;
                 i++;
+                FENState++;
+        
+                break;
+            case Fullmove:
+                fen.fullmove = (int) fen_string[i] - 48;
                 FENState++;
 
                 break;
-            case Fullmove:
-                fen.fullmove = (int) fen_string[i];
+
+            case EndState: // not really needed
                 break;
             default:
                 break;
