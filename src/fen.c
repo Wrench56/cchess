@@ -1,6 +1,9 @@
 #include <ncurses.h>
 #include <stdlib.h>
 
+#include "settings.h"
+
+
 void draw_fen(int x, int y, char fen_table[], size_t fen_size) {
     short is_black_square = 1;
     short is_black = 0;
@@ -83,22 +86,22 @@ void draw_fen(int x, int y, char fen_table[], size_t fen_size) {
     
             switch (char_to_process) {
                 case 'P': // Pawn
-                    printw(" P");
+                    printw(FIGURE_STRING, PAWN_FIGURE);
                     break;
                 case 'R': // Rook
-                    printw(" R");
+                    printw(FIGURE_STRING, ROOK_FIGURE);
                     break;
                 case 'B': // Bishop
-                    printw(" B");
+                    printw(FIGURE_STRING, BISHOP_FIGURE);
                     break;
                 case 'N': // Knight
-                    printw(" N");
+                    printw(FIGURE_STRING, KNIGHT_FIGURE);
                     break;
                 case 'Q': // Queen
-                    printw(" Q");
+                    printw(FIGURE_STRING, QUEEN_FIGURE);
                     break;
                 case 'K': // King
-                    printw(" K");
+                    printw(FIGURE_STRING, KING_FIGURE);
                     break;
                 default:
                     printw("Er");
