@@ -20,9 +20,9 @@ void draw_fen(int x, int y, char fen_table[], size_t fen_size) {
     attron(COLOR_PAIR(1));
 
     for (int i = 0; i < fen_size; i++) {
-        is_black = 0;        
+        is_black = 0;
+
         // Skip x squares OR "newline"
-        
         if (fen_table[i] < 'A') {
             move(y + y_offset, x + x_offset);
             if (fen_table[i] == '/') {
@@ -60,6 +60,11 @@ void draw_fen(int x, int y, char fen_table[], size_t fen_size) {
         
         } else {
             // Set the colors
+            
+            if (fen_table[i] >= 'a') {
+                is_black = 2;
+            }
+
             if (is_black_square == 0) {
                 is_black_square = 1;
                 attroff(COLOR_PAIR(1));
@@ -103,12 +108,6 @@ void draw_fen(int x, int y, char fen_table[], size_t fen_size) {
             x_offset += 2;
 
         }
-
-
-        if (fen_table[i+1] >= 'a') {
-            is_black = 2;
-        }
-        
     }
     move(y + y_offset, x + x_offset);
     refresh();
