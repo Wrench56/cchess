@@ -16,7 +16,9 @@ int main()
     display_menu();
 
     char basic_fen[] = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+    struct FEN fen;
 
+    fen = parse_fen(basic_fen, sizeof(basic_fen));
     draw_fen(2, 1, basic_fen, sizeof(basic_fen));
     getch();
     endwin();

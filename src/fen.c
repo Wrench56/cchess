@@ -1,8 +1,84 @@
 #include <ncurses.h>
-#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
+#include "fen.h"
 #include "settings.h"
 
+enum FENSM {
+    PiecePlacement,
+    ActiveColor,
+    Castle,
+    EnPassant,
+    Halfmove,
+    Fullmove
+};
+
+struct FEN parse_fen(char fen_string[], size_t fen_size) {
+    enum FENSM FENState = PiecePlacement;
+    struct FEN fen;
+    for (short i = 0; i < fen_size; i++) {
+        switch (FENState) {
+            case PiecePlacement:
+                if (fen_string[i] != ' ') {
+                    continue;
+                }
+                memcpy(fen.piece_placement, fen_string, i);
+                FENState++;
+
+                break;
+
+            case ActiveColor:
+                if (fen_string[i] == 'w') {
+                    fen.active_color = 0;
+                } else {
+                    fen.active_color = 1;
+                }
+                i++;
+                FENState++;
+
+                break;
+
+            case Castle:
+                if (fen_string[i] == 'K') {
+                    fen.castle_white++;
+                } else if (fen_string[i] == 'Q') {
+                    fen.castle_white += 2;
+                } else if (fen_string[i] == 'k') {
+                    fen.castle_black++;
+                } else if (fen_string[i] == 'q') {
+                    fen.castle_black += 2;
+                } else {
+                    FENState++;
+                }
+
+                break;
+            case EnPassant:
+                if (fen_string[i] != '-') {
+                    strncat(fen.en_passant, &fen_string[i], 2);
+                    i++;
+                }
+                i++;
+                FENState++;
+
+                break;
+            case Halfmove:
+                fen.halfmove = (short) fen_string[i];
+
+                i++;
+                FENState++;
+
+                break;
+            case Fullmove:
+                fen.fullmove = (int) fen_string[i];
+                break;
+            default:
+                break;
+        }
+    }
+
+    return fen;
+}
 
 void draw_fen(int x, int y, char fen_table[], size_t fen_size) {
     short is_black_square = 1;
@@ -28,6 +104,7 @@ void draw_fen(int x, int y, char fen_table[], size_t fen_size) {
         // Skip x squares OR "newline"
         if (fen_table[i] < 'A') {
             move(y + y_offset, x + x_offset);
+
             if (fen_table[i] == '/') {
                 y_offset++;
                 x_offset = 0;
