@@ -1,8 +1,9 @@
 #include <ncurses.h>
 #include <locale.h>
 
-#include "menu.h"
 #include "board.h"
+#include "colors.h"
+#include "menu.h"
 
 int main()
 {
@@ -10,8 +11,13 @@ int main()
     setlocale(LC_ALL, "");
 
 	initscr();
+    init_colors();
+
     display_menu();
-    draw_board();
+
+    char basic_fen[] = "8/8/8/8/8/8/8/8";
+
+    draw_fen(0, 0, basic_fen, sizeof(basic_fen));
     getch();
     endwin();
 
