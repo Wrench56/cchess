@@ -1,7 +1,7 @@
 #include <ncurses.h>
 #include <locale.h>
 
-#include "board.h"
+#include "fen.h"
 #include "colors.h"
 #include "menu.h"
 
@@ -17,7 +17,7 @@ int main()
 
     char basic_fen[] = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
-    draw_fen(0, 0, basic_fen, sizeof(basic_fen));
+    draw_fen(2, 1, basic_fen, sizeof(basic_fen));
     getch();
     endwin();
 
