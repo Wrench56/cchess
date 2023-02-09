@@ -1,5 +1,5 @@
 #include <ncurses.h>
-#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "fen.h"
@@ -11,13 +11,15 @@ enum FENSM {
     Castle,
     EnPassant,
     Halfmove,
-    Fullmove,
-    EndState
+    Fullmove
 };
 
 struct FEN parse_fen(char fen_string[], size_t fen_size) {
     enum FENSM FENState = PiecePlacement;
     struct FEN fen;
+    
+    short moves_start = 0;
+    char moves[4]; // Longest theoretically possible game is 5949 moves
     
     // Set some defaults // 
 
@@ -74,22 +76,35 @@ struct FEN parse_fen(char fen_string[], size_t fen_size) {
 
                 break;
             case Halfmove:
-                fen.halfmove = (short) fen_string[i] - 48;
-                i++;
-                FENState++;
+                if (moves_start == 0) {
+                    moves_start = i;
+                }
+                if (fen_string[i] != ' ') {
+                    moves[i-moves_start] = fen_string[i];
+                } else {
+                    fen.halfmove = atoi(moves);
+                    moves[0] = 0;
+                    moves_start = 0;
+
+                    FENState++;
+                }
         
                 break;
             case Fullmove:
-                fen.fullmove = (int) fen_string[i] - 48;
-                FENState++;
-
+                
+                if (moves_start == 0) {
+                    moves_start = i;
+                }
+                // Ignore \0
+                if (fen_string[i] != '\0') {
+                    moves[i-moves_start] = fen_string[i];
+                }
                 break;
 
-            case EndState: // not really needed
-                break;
             default:
                 break;
         }
+        fen.fullmove = atoi(moves);
     }
 
     return fen;
