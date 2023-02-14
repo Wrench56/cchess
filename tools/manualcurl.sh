@@ -23,6 +23,16 @@ then
         curl https://lichess.org/api/challenge/$3 -H "Authorization: Bearer $1" "Content-Type: application/x-www-form-urlencoded" -d "" -o /dev/null -s
         echo
     fi
+elif [ $2 = 4 ]
+then
+    if [ -z "$3"]
+    then
+        echo "Usage: ... <game_id>"
+    else
+        echo "Streaming..."
+        curl -N https://lichess.org/api/board/game/stream/$3 -H "Authorization: Bearer $1" "Content-Type: application/x-www-form-urlencoded"
+        echo
+    fi
 else
     echo "Error: $2 is not a valid mode!"
 fi
