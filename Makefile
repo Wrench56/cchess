@@ -6,8 +6,8 @@ FLAGS=-lncursesw
 
 .PHONY: clean build
 
-build: $(SRC_DIR)/*.c
-	$(CC) -o $(BUILD_DIR)/cchess.out $(SRC_DIR)/*.c $(FLAGS)
+build: $(SRC_DIR)/* $(SRC_DIR)/menu/*
+	$(CC) -o $(BUILD_DIR)/cchess.out $(SRC_DIR)/*.c $(SRC_DIR)/menu/*.c $(FLAGS)
 
 clean:
 	rm -rf ./build

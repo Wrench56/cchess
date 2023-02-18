@@ -28,3 +28,5 @@
     #define FIGURE_STRING " %s"
 #endif
 
+#define AUTOLOGIN_KEY "cchess_key"
+#define AUTOLOGIN_KEY_LEN sizeof(AUTOLOGIN_KEY)
