@@ -21,8 +21,6 @@ int main()
 
     //fen = parse_fen(basic_fen, sizeof(basic_fen));
     //draw_fen(2, 1, fen.piece_placement, fen.piece_placement_length);
-
-    getch();
     endwin();
 
 	return 0;
