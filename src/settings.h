@@ -1,5 +1,12 @@
 #pragma once
 
+#include <ncurses.h>
+
+#define WHITE_SQUARE_COLOR COLOR_CYAN
+#define BLACK_SQUARE_COLOR COLOR_MAGENTA
+
+#define WHITE_FIGURE_COLOR COLOR_WHITE
+#define BLACK_FIGURE_COLOR COLOR_BLACK
 
 #if defined(USE_FIGURES) 
     #define PAWN_FIGURE "♙"
