@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-I.
 BUILD_DIR=./build
 SRC_DIR=./src
-FLAGS=-lncursesw -lcurl -lcjson
+FLAGS=-lncursesw -lcurl -lcjson -DUSE_SYMBOLS
 
 .PHONY: clean build
 
