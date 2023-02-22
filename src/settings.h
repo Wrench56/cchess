@@ -30,8 +30,8 @@
 
 #if defined(USE_SYMBOLS)
     #define BLITZ_SYMBOL ""
-    #define BULLET_SYMBOL ""
-    #define CORRESPONDENCE_SYMBOL ""
+    #define BULLET_SYMBOL ""
+    #define CORRESPONDENCE_SYMBOL ""
     #define CLASSICAL_SYMBOL ""
     #define RAPID_SYMBOL ""
 #else
