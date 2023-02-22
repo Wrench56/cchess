@@ -6,7 +6,7 @@
 #include "../settings.h"
 #include "../cipher.h"
 
-#include "home.h"
+#include "dashboard.h"
 #include "register.h"
 
 
@@ -28,7 +28,7 @@ void login() {
         token = xor_cipher(file_content, AUTOLOGIN_KEY, strlen(file_content), AUTOLOGIN_KEY_LEN);
 
         fclose(file);
-        home(token);
+        show_dashboard(token);
 
         return;
     }
@@ -141,7 +141,7 @@ void login() {
         token = xor_cipher(file_content, password, strlen(file_content), strlen(password));
 
         fclose(file);
-        home(token);
+        show_dashboard(token);
     }
     else
     {

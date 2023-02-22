@@ -35,7 +35,7 @@ void process_ratings(cJSON* game_type, char* game_type_name, char* symbol) {
     printw("%i", rating->valueint);
 }
 
-void home(char* api_key) {
+void show_dashboard(char* api_key) {
     clear();
 
     cJSON* json;
