@@ -126,19 +126,18 @@ void login() {
 
     if (file = fopen(username, "r"))
     {
-        /* Yes, it exists! Read it. */
+        /* Yes, user file exists! Read it. */
 
         size = 0;
 
         fseek(file, 0, SEEK_END);
-        size = ftell(file);
+        size = ftell(file) + 1;
         fseek(file, 0, SEEK_SET);
 
         char file_content[size];
         char* token;    
 
-        fgets(file_content, size+1, file);
-
+        fgets(file_content, size, file);
         token = xor_cipher(file_content, password, strlen(file_content), strlen(password));
 
         fclose(file);
