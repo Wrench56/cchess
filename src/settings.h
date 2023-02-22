@@ -28,5 +28,19 @@
     #define FIGURE_STRING " %s"
 #endif
 
+#if defined(USE_SYMBOLS)
+    #define BLITZ_SYMBOL ""
+    #define BULLET_SYMBOL ""
+    #define CORRESPONDENCE_SYMBOL ""
+    #define CLASSICAL_SYMBOL ""
+    #define RAPID_SYMBOL ""
+#else
+    #define BLITZ_SYMBOL ""
+    #define BULLET_SYMBOL ""
+    #define CORRESPONDENCE_SYMBOL ""
+    #define CLASSICAL_SYMBOL ""
+    #define RAPID_SYMBOL ""
+#endif
+
 #define AUTOLOGIN_KEY "cchess_key"
 #define AUTOLOGIN_KEY_LEN sizeof(AUTOLOGIN_KEY)

@@ -12,4 +12,6 @@ void init_colors() {
     init_pair(4, BLACK_FIGURE_COLOR, BLACK_SQUARE_COLOR);
 
     init_pair(5, COLOR_RED, -1);
+    init_pair(6, COLOR_CYAN, -1);
+    init_pair(7, COLOR_GREEN, -1);
 }
