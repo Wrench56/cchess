@@ -6,7 +6,7 @@
 #include "utils.h"
 #include "game.h"
 
-void join(char* api_key) {
+short join(char* api_key) {
     curs_set(0);
 
     WINDOW* win;
@@ -15,7 +15,7 @@ void join(char* api_key) {
     cJSON* fail = cJSON_GetObjectItemCaseSensitive(json, "fail");
     if (fail->valueint == 1) {
         sw_error(win, "Invalid JSON!");
-        return;
+        return 0;
     }
     cJSON* now_playing = cJSON_GetObjectItemCaseSensitive(json, "nowPlaying");
     if (cJSON_GetArraySize(now_playing) > 1) {
@@ -64,10 +64,14 @@ void join(char* api_key) {
     delwin(win);
     if (getch() == 'y') {
         cJSON* game_id = cJSON_GetObjectItemCaseSensitive(game_info, "gameId");
-        game_stream(game_id->valuestring);
+        game_stream(api_key, game_id->valuestring);
+
+        return 1;
     }
 
     /* Cleanup */
     touchwin(stdscr);
     wrefresh(stdscr);
+
+    return 0;
 }

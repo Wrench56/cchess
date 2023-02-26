@@ -30,7 +30,12 @@ void login() {
         token = xor_cipher(file_content, AUTOLOGIN_KEY, strlen(file_content), AUTOLOGIN_KEY_LEN);
 
         fclose(file);
-        show_dashboard(token);
+        
+        while (1) {
+            if (show_dashboard(token) == 1) {
+                break;
+            }
+        }
 
         return;
     }
@@ -144,7 +149,12 @@ void login() {
         token = xor_cipher(file_content, password, strlen(file_content), strlen(password));
 
         fclose(file);
-        show_dashboard(token);
+        
+        while (1) {
+            if (show_dashboard(token) == 1) {
+                break;
+            }
+        }
     }
     else
     {

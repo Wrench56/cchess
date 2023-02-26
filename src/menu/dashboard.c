@@ -43,7 +43,7 @@ void redraw_cursor(int cursor, int prev_cursor) {
     mvprintw(cursor, 18, ">");
 }
 
-void show_dashboard(char* api_key) {
+short show_dashboard(char* api_key) {
     clear();
     curs_set(0);
 
@@ -55,7 +55,7 @@ void show_dashboard(char* api_key) {
     cJSON* fail = cJSON_GetObjectItemCaseSensitive(json, "fail");
     if (fail->valueint == 1) {
         error("Invalid request!");
-        return;
+        return 1;
     }
 
     int win_w;
@@ -67,7 +67,7 @@ void show_dashboard(char* api_key) {
     cJSON *name = cJSON_GetObjectItemCaseSensitive(json, "username");
     if (name == NULL) {
         error("Invalid JSON");
-        return;
+        return 1;
     }
     
     mvprintw(0, (int)((win_w-strlen(name->valuestring)-8)/2), "Welcome ");
@@ -98,7 +98,7 @@ void show_dashboard(char* api_key) {
     cJSON* seen_at = cJSON_GetObjectItemCaseSensitive(json, "seenAt");
     if (seen_at == NULL) {
         error("Invalid JSON");
-        return;
+        return 1;
     }
 
     time_t t = (long)seen_at->valuedouble/1000; // convert ms -> sec
@@ -142,7 +142,9 @@ void show_dashboard(char* api_key) {
         if (key == '\n') {
             switch (cursor-4) {
                 case 0: // Join
-                    join(api_key);
+                    if (join(api_key) == 1) {
+                        return 0;
+                    }
                     break;
                 case 1: // New Game
                     break;
@@ -196,4 +198,6 @@ void show_dashboard(char* api_key) {
             mvprintw(10, 1, "                       ");
         }
     }
+
+    return 1;
 }

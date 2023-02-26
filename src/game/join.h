@@ -1,3 +1,3 @@
 #pragma once
 
-void join(char* api_key);
+short join(char* api_key);
