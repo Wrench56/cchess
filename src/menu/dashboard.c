@@ -30,13 +30,19 @@ void process_ratings(cJSON* game_type, char* game_type_name, char* symbol) {
     if (symbol != "") {
         printw("%s ", symbol);
     }
-    printw("%s: ", game_type_name);
+    printw("%s  ", game_type_name);
     attroff(COLOR_PAIR(7));
     printw("%i", rating->valueint);
 }
 
+void redraw_cursor(int cursor, int prev_cursor) {
+    mvprintw(prev_cursor, 18, " ");
+    mvprintw(cursor, 18, ">");
+}
+
 void show_dashboard(char* api_key) {
     clear();
+    curs_set(0);
 
     cJSON* json;
     json = get_user_data(api_key);
@@ -70,14 +76,16 @@ void show_dashboard(char* api_key) {
     move(1, 0);
     for (int i = 0; i < win_w; i++) printw("=");
 
-    //cJSON_Delete(name);
     /* =====================*/
 
     /* Show currently playing */
+    short is_playing = 0;
+
     cJSON *playing = cJSON_GetObjectItemCaseSensitive(json, "playing");
     if (playing == NULL) {
         mvprintw(2, 1, "In menu");
     } else {
+        is_playing = 1;
         attron(COLOR_PAIR(7));
         mvprintw(2, 1, "In game");
         attroff(COLOR_PAIR(7));
@@ -102,16 +110,71 @@ void show_dashboard(char* api_key) {
     /* Show ratings */
     cJSON* perfs = cJSON_GetObjectItemCaseSensitive(json, "perfs");
     
-    move(4, 1);
-    process_ratings(cJSON_GetObjectItemCaseSensitive(perfs, "blitz"), "Blitz  ", BLITZ_SYMBOL);
-    move(5, 1);
-    process_ratings(cJSON_GetObjectItemCaseSensitive(perfs, "bullet"), "Bullet ", BULLET_SYMBOL);
-    move(6, 1);
-    process_ratings(cJSON_GetObjectItemCaseSensitive(perfs, "correspondence"), "Mailing", CORRESPONDENCE_SYMBOL);
-    move(7, 1);
-    process_ratings(cJSON_GetObjectItemCaseSensitive(perfs, "classical"), "Classic", CLASSICAL_SYMBOL);
-    move(8, 1);
-    process_ratings(cJSON_GetObjectItemCaseSensitive(perfs, "rapid"), "Rapid  ", RAPID_SYMBOL);
+    move(4, 1); process_ratings(cJSON_GetObjectItemCaseSensitive(perfs, "blitz"), "Blitz  ", BLITZ_SYMBOL);
+    move(5, 1); process_ratings(cJSON_GetObjectItemCaseSensitive(perfs, "bullet"), "Bullet ", BULLET_SYMBOL);
+    move(6, 1); process_ratings(cJSON_GetObjectItemCaseSensitive(perfs, "correspondence"), "Mailing", CORRESPONDENCE_SYMBOL);
+    move(7, 1); process_ratings(cJSON_GetObjectItemCaseSensitive(perfs, "classical"), "Classic", CLASSICAL_SYMBOL);
+    move(8, 1); process_ratings(cJSON_GetObjectItemCaseSensitive(perfs, "rapid"), "Rapid  ", RAPID_SYMBOL);
 
-    getch();
+
+    /* Show "play buttons" */
+
+    short cursor = 5;
+
+    if (is_playing == 1) {
+        cursor = 4;
+        mvprintw(4, 20, "Join");
+    }
+    mvprintw(5, 20, "New Game");
+    mvprintw(6, 20, "Challenge");
+
+    mvprintw(cursor, 18, ">");
+
+    /* Wait for key inputs*/
+
+    char key = '\0';
+
+    while (key != 'q') {
+        key = getch();
+        if (key == '\n') {
+            switch (cursor-4) {
+                case 0: // Join
+                    break;
+                case 1: // New Game
+                    break;
+                case 2: // Challenge (friend)
+                    break;
+            }
+        } else if (key == 's') {
+            if (cursor < 6) {
+                cursor++;
+                redraw_cursor(cursor, cursor - 1);
+            }
+        } else if (key == 'w') {
+            if (cursor > 5 - is_playing) {
+                cursor--;
+                redraw_cursor(cursor, cursor + 1);
+            }
+        } else if (key == '?') { // Show help
+            WINDOW *win = newwin(win_h-1, win_w, 1, 0);
+            refresh();
+
+            box(win, 0, 0);
+            mvwprintw(win, 0, 3, " Help ");
+
+            mvwprintw(win, 1, 2, "w - (Nav) Up");
+            mvwprintw(win, 2, 2, "s - (Nav) Down");
+            mvwprintw(win, 3, 2, "? - Help");
+            mvwprintw(win, 4, 2, "q - Quit");
+            mvwprintw(win, 5, 2, "-- Menu specials --");
+            mvwprintw(win, 6, 2, "@ - .autologin user");
+            wrefresh(win);
+
+            while (getch() != 'q');
+	        delwin(win);
+
+            touchwin(stdscr);
+            wrefresh(stdscr);
+        }
+    }
 }
