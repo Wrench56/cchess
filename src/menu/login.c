@@ -11,20 +11,22 @@
 
 
 void login() {
-    int size;
-    char file_content[size];
-    char* token;
+    int size = 0;
     
     /* Check if there is .autologin file */
     FILE *file;
     if ((file = fopen(".autologin", "r")))
     {
         /* Yes, it exists! Read it. */
-        fseek(file, 0, SEEK_END);
-        size = ftell(file);
-        fseek(file, 0, SEEK_SET);   
-        fgets(file_content, size+1, file);
+        fseek(file, 0, SEEK_END); // Maybe I should just skip this part and only load in 24 chars...
+        size = ftell(file) + 1;
+        fseek(file, 0, SEEK_SET);
 
+        char file_content[size];
+        file_content[24] = '\0';
+        char* token;
+
+        fread(file_content, sizeof(file_content) - 1, size, file);
         token = xor_cipher(file_content, AUTOLOGIN_KEY, strlen(file_content), AUTOLOGIN_KEY_LEN);
 
         fclose(file);
@@ -135,9 +137,10 @@ void login() {
         fseek(file, 0, SEEK_SET);
 
         char file_content[size];
-        char* token;    
+        file_content[24] = '\0';
+        char* token;
 
-        fgets(file_content, size, file);
+        fread(file_content, sizeof(file_content) - 1, size, file);
         token = xor_cipher(file_content, password, strlen(file_content), strlen(password));
 
         fclose(file);
