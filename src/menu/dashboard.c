@@ -9,6 +9,7 @@
 #include "../settings.h"
 #include "../cipher.h"
 
+#include "../game/join.h"
 
 void error(char* message) {
     /* Report error */
@@ -140,6 +141,7 @@ void show_dashboard(char* api_key) {
         if (key == '\n') {
             switch (cursor-4) {
                 case 0: // Join
+                    join(api_key);
                     break;
                 case 1: // New Game
                     break;
