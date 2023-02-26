@@ -33,7 +33,7 @@ size_t get_https_result(char* buffer, size_t size, size_t nmemb, void* userp)
 }
 
 
-cJSON* get_user_data(char* api_key) {
+cJSON* get_request(char* api_key, char* url) {
     CURL *curl;
     CURLcode res;
     struct curl_slist *list = NULL;
@@ -47,7 +47,7 @@ cJSON* get_user_data(char* api_key) {
     char auth_header[46] = "Authorization: Bearer ";
     
     if (curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, "https://lichess.org/api/account");
+        curl_easy_setopt(curl, CURLOPT_URL, url);
         list = curl_slist_append(list, strcat(auth_header, api_key));
         list = curl_slist_append(list, "Accept:");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
@@ -71,5 +71,3 @@ cJSON* get_user_data(char* api_key) {
         return cJSON_Parse("{\"fail\": 1}");
     }
 }
-
-

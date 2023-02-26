@@ -2,4 +2,4 @@
 
 #include <cjson/cJSON.h>
 
-cJSON* get_user_data(char* api_key);
+cJSON* get_request(char* api_key, char* url);
