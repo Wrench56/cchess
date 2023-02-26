@@ -4,8 +4,8 @@
 #include <ncurses.h>
 
 #include "../settings.h"
-#include "../cipher.h"
 
+#include "cipher.h"
 #include "dashboard.h"
 #include "register.h"
 

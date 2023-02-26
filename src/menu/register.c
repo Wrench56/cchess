@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../cipher.h"
+#include "cipher.h"
 
 void reg() {
     char key;

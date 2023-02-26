@@ -7,9 +7,10 @@
 
 #include "../api.h"
 #include "../settings.h"
-#include "../cipher.h"
 
 #include "../game/join.h"
+
+#include "cipher.h"
 
 void error(char* message) {
     /* Report error */
