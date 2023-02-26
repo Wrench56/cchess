@@ -7,6 +7,7 @@
 
 #include "../api.h"
 #include "../settings.h"
+#include "../cipher.h"
 
 
 void error(char* message) {
@@ -155,7 +156,7 @@ void show_dashboard(char* api_key) {
                 cursor--;
                 redraw_cursor(cursor, cursor + 1);
             }
-        } else if (key == '?') { // Show help
+        } else if (key == '?' || key == 'h') { // Show help
             WINDOW *win = newwin(win_h-1, win_w, 1, 0);
             refresh();
 
@@ -164,7 +165,7 @@ void show_dashboard(char* api_key) {
 
             mvwprintw(win, 1, 2, "w - (Nav) Up");
             mvwprintw(win, 2, 2, "s - (Nav) Down");
-            mvwprintw(win, 3, 2, "? - Help");
+            mvwprintw(win, 3, 2, "? - Help (or h)");
             mvwprintw(win, 4, 2, "q - Quit");
             mvwprintw(win, 5, 2, "-- Menu specials --");
             mvwprintw(win, 6, 2, "@ - .autologin user");
@@ -175,6 +176,21 @@ void show_dashboard(char* api_key) {
 
             touchwin(stdscr);
             wrefresh(stdscr);
+        } else if (key == '@') { // Set .autologin
+            mvprintw(10, 1, "Set .autologin? [y/n] >");
+            curs_set(1);
+            if (getch() == 'y') {
+                FILE *file;
+                char* encrypted_token = NULL;
+                encrypted_token = xor_cipher(api_key, AUTOLOGIN_KEY, strlen(api_key), AUTOLOGIN_KEY_LEN);
+                file = fopen(".autologin", "w");
+                fputs(encrypted_token, file);
+
+                fclose(file);
+                free(encrypted_token);
+            }
+            curs_set(0);
+            mvprintw(10, 1, "                       ");
         }
     }
 }
