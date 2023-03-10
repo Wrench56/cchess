@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include "fen.h"
-#include "settings.h"
+#include "../settings.h"
 
 enum FENSM {
     PiecePlacement,
