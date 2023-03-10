@@ -2,4 +2,7 @@
 /build
 
 # Ignore playground folder
-playground
+/playground
+
+# Ignore VSCode settings (for now)
+/.vscode
