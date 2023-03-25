@@ -61,8 +61,11 @@ short join(char* api_key) {
     mvwprintw(win, 7, 1, "Join [y/n]");
 
     wrefresh(win);
-    delwin(win);
     if (getch() == 'y') {
+
+        /* Cleanup */
+        delwin(win);
+
         cJSON* game_id = cJSON_GetObjectItemCaseSensitive(game_info, "gameId");
         game_stream(api_key, game_id->valuestring);
 
@@ -70,6 +73,7 @@ short join(char* api_key) {
     }
 
     /* Cleanup */
+    delwin(win);
     touchwin(stdscr);
     wrefresh(stdscr);
 
