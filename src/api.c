@@ -106,19 +106,19 @@ size_t parse_game_stream(char* buffer, size_t size, size_t nmemb, void* userp)
 }
 
 
-void read_game_stream(void* game_state_ptr) {
+void read_game_stream(void* game_struct_ptr) {
     CURL *curl;
     CURLcode res;
     struct curl_slist *list = NULL;
-    struct GameState* game_state = (struct GameState*)game_state_ptr;
+    struct Game* game = (struct Game*)game_struct_ptr;
 
     curl = curl_easy_init();
     char auth_header[47] = "Authorization: Bearer ";
     char url[51] = "https://lichess.org/api/board/game/stream/";
     
     if (curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, strcat(url, game_state->game_id));
-        list = curl_slist_append(list, strcat(auth_header, game_state->api_key));
+        curl_easy_setopt(curl, CURLOPT_URL, strcat(url, game->game_id));
+        list = curl_slist_append(list, strcat(auth_header, game->api_key));
         list = curl_slist_append(list, "Accept:");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
 

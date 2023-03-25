@@ -9,20 +9,20 @@
 
 
 /* API thread */
-void* read_api(void* game_state_ptr) {
-    read_game_stream(game_state_ptr);
+void* read_api(void* game_struct_ptr) {
+    read_game_stream(game_struct_ptr);
 }
 
 /* Main thread (Input thread) */
 void game_stream(char* api_key, char* game_id) {
     /* Set up API thread */
     pthread_t api_thread;
-    struct GameState game_state;
+    struct Game game;
 
-    strcpy(game_state.api_key, api_key);
-    strcpy(game_state.game_id, game_id);
+    strcpy(game.api_key, api_key);
+    strcpy(game.game_id, game_id);
 
-    pthread_create(&api_thread, NULL, read_api, &game_state);
+    pthread_create(&api_thread, NULL, read_api, &game);
     
     /* Setup UI */
     clear();
