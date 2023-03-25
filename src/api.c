@@ -77,6 +77,8 @@ cJSON* get_request(char* api_key, char* url) {
 
 size_t parse_game_stream(char* buffer, size_t size, size_t nmemb, void* userp)
 {
+    struct Game *game = (struct Game *)userp;
+
     size_t realsize = size * nmemb;
     char data[realsize + 1];
     memcpy(data, buffer, realsize);
@@ -92,14 +94,23 @@ size_t parse_game_stream(char* buffer, size_t size, size_t nmemb, void* userp)
 
     cJSON* type = cJSON_GetObjectItemCaseSensitive(json, "type");
     
-    if (type->valuestring == "gameState") {
+    if (strcmp(type->valuestring, "gameState") == 0) {
         cJSON* moves = cJSON_GetObjectItemCaseSensitive(json, "");
-    } else if (type->valuestring == "opponentGone") {
+    } else if (strcmp(type->valuestring, "opponentGone") == 0) {
 
-    } else if (type->valuestring == "gameFull") {
+    } else if (strcmp(type->valuestring, "gameFull") == 0) {
+        printf("GameFull");
+        cJSON* white = cJSON_GetObjectItemCaseSensitive(json, "white");
+        cJSON* w_name = cJSON_GetObjectItemCaseSensitive(white, "name");
+        cJSON* black = cJSON_GetObjectItemCaseSensitive(json, "black");
+        cJSON* b_name = cJSON_GetObjectItemCaseSensitive(white, "name");
 
+        strcpy(game->white_name, w_name->valuestring);
+        strcpy(game->black_name, b_name->valuestring);
+        move(0, 0);
+        printw("Hello: %s\n", game->white_name);
+        refresh();
     } else { // chatLine
-        
     }
 
     return realsize;
@@ -123,7 +134,7 @@ void read_game_stream(void* game_struct_ptr) {
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
 
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, parse_game_stream);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, NULL);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) &game);
  
     
         res = curl_easy_perform(curl);
