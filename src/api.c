@@ -80,7 +80,7 @@ size_t parse_game_stream(char* buffer, size_t size, size_t nmemb, void* userp)
     size_t realsize = size * nmemb;
     char data[realsize + 1];
     memcpy(data, buffer, realsize);
-    if (data < 2) { // Check for keep-alive
+    if (*data < 2) { // Check for keep-alive
         return realsize;
     }
 
