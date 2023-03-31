@@ -6,6 +6,7 @@
 #include <ncurses.h>
 
 #include "game/game.h"
+#include "game/board.h"
 
 struct MemoryStruct {
   char *memory;
@@ -95,11 +96,14 @@ size_t parse_game_stream(char* buffer, size_t size, size_t nmemb, void* userp)
     cJSON* type = cJSON_GetObjectItemCaseSensitive(json, "type");
     
     if (strcmp(type->valuestring, "gameState") == 0) {
-        cJSON* moves = cJSON_GetObjectItemCaseSensitive(json, "");
+        cJSON* state = cJSON_GetObjectItemCaseSensitive(json, "state");
+        cJSON* moves = cJSON_GetObjectItemCaseSensitive(moves, "moves");
+
+        moves->valuestring += strlen(moves->valuestring); // Parse only the last move!
+
     } else if (strcmp(type->valuestring, "opponentGone") == 0) {
 
     } else if (strcmp(type->valuestring, "gameFull") == 0) {
-        printf("GameFull");
         cJSON* white = cJSON_GetObjectItemCaseSensitive(json, "white");
         cJSON* w_name = cJSON_GetObjectItemCaseSensitive(white, "name");
         cJSON* black = cJSON_GetObjectItemCaseSensitive(json, "black");
@@ -107,10 +111,23 @@ size_t parse_game_stream(char* buffer, size_t size, size_t nmemb, void* userp)
 
         strcpy(game->white_name, w_name->valuestring);
         strcpy(game->black_name, b_name->valuestring);
-        move(0, 0);
-        printw("Hello: %s\n", game->white_name);
+
+        cJSON* state = cJSON_GetObjectItemCaseSensitive(json, "state");
+        cJSON* moves = cJSON_GetObjectItemCaseSensitive(state, "moves");
+
+        // Extract the first token
+        char * move_ = strtok(moves->valuestring, " ");
+        // loop through the string to extract all other tokens
+        while( move_ != NULL ) {
+            parse_move(game, move_);
+            move_ = strtok(NULL, " ");
+        }
+
+        show_board(game, 1, 1);
         refresh();
+
     } else { // chatLine
+
     }
 
     return realsize;
@@ -121,7 +138,7 @@ void read_game_stream(void* game_struct_ptr) {
     CURL *curl;
     CURLcode res;
     struct curl_slist *list = NULL;
-    struct Game* game = (struct Game*)game_struct_ptr;
+    struct Game *game = (struct Game*)game_struct_ptr;
 
     curl = curl_easy_init();
     char auth_header[47] = "Authorization: Bearer ";
@@ -134,7 +151,7 @@ void read_game_stream(void* game_struct_ptr) {
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
 
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, parse_game_stream);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) &game);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) game);
  
     
         res = curl_easy_perform(curl);
