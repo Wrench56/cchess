@@ -19,13 +19,12 @@ void show_board(struct Game* game, int x, int y) {
 
 
 void parse_move(struct Game* game, char* move_pair) {
-    short rank = move_pair[1] - 48 * 8;
+    short rank = (move_pair[1] - 49) * 8;
     short file = move_pair[0] - 97;
     char piece = game->board[rank + file];
     game->board[rank + file] = '0';
 
-    rank = move_pair[3] - 48 * 8;
+    rank = (move_pair[3] - 49) * 8;
     file = move_pair[2] - 97;
     game->board[rank + file] = piece;
-
 }

@@ -100,6 +100,8 @@ size_t parse_game_stream(char* buffer, size_t size, size_t nmemb, void* userp)
         cJSON* moves = cJSON_GetObjectItemCaseSensitive(moves, "moves");
 
         moves->valuestring += strlen(moves->valuestring); // Parse only the last move!
+        parse_move(game, moves->valuestring);
+        show_board(game, 1, 1);
 
     } else if (strcmp(type->valuestring, "opponentGone") == 0) {
 
@@ -115,14 +117,18 @@ size_t parse_game_stream(char* buffer, size_t size, size_t nmemb, void* userp)
         cJSON* state = cJSON_GetObjectItemCaseSensitive(json, "state");
         cJSON* moves = cJSON_GetObjectItemCaseSensitive(state, "moves");
 
-        // Extract the first token
-        char * move_ = strtok(moves->valuestring, " ");
-        // loop through the string to extract all other tokens
-        while( move_ != NULL ) {
+        if (strlen(moves->valuestring) == 4) {
+            parse_move(game, moves->valuestring);
+        } else if (strlen(moves->valuestring) > 4) {
+            // Extract the first token
+            char * move_ = strtok(moves->valuestring, " ");
             parse_move(game, move_);
-            move_ = strtok(NULL, " ");
+            // loop through the string to extract all other tokens
+            while( move_ != NULL ) {
+                parse_move(game, move_);
+                move_ = strtok(NULL, " ");
+            }
         }
-
         show_board(game, 1, 1);
         refresh();
 
