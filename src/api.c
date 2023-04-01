@@ -83,25 +83,24 @@ size_t parse_game_stream(char* buffer, size_t size, size_t nmemb, void* userp)
     size_t realsize = size * nmemb;
     char data[realsize + 1];
     memcpy(data, buffer, realsize);
-    if (*data < 2) { // Check for keep-alive
+    if (strlen(data) < 8) { // Check for keep-alive (anomaly: message with a length of 6 bytes?)
         return realsize;
     }
 
     cJSON* json = cJSON_Parse(data);
     if (json == NULL) {
-        printw("Error: Can't parse JSON!");
+        printw("Error: Can't parse JSON!\n Data: >%s<", data);
         return realsize;
     }
 
     cJSON* type = cJSON_GetObjectItemCaseSensitive(json, "type");
     
     if (strcmp(type->valuestring, "gameState") == 0) {
-        cJSON* state = cJSON_GetObjectItemCaseSensitive(json, "state");
-        cJSON* moves = cJSON_GetObjectItemCaseSensitive(moves, "moves");
+        cJSON* moves = cJSON_GetObjectItemCaseSensitive(json, "moves");
 
-        moves->valuestring += strlen(moves->valuestring); // Parse only the last move!
-        parse_move(game, moves->valuestring);
+        parse_move(game, moves->valuestring  + strlen(moves->valuestring) - 4);
         show_board(game, 1, 1);
+        refresh();
 
     } else if (strcmp(type->valuestring, "opponentGone") == 0) {
 
@@ -122,7 +121,7 @@ size_t parse_game_stream(char* buffer, size_t size, size_t nmemb, void* userp)
         } else if (strlen(moves->valuestring) > 4) {
             // Extract the first token
             char * move_ = strtok(moves->valuestring, " ");
-            parse_move(game, move_);
+
             // loop through the string to extract all other tokens
             while( move_ != NULL ) {
                 parse_move(game, move_);
