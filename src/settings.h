@@ -19,7 +19,7 @@
     #define FIGURE_STRING "%s "
 #else
     #define PAWN_FIGURE "P"
-    #define KNIGHT_FIGURE "K"
+    #define KNIGHT_FIGURE "N"
     #define BISHOP_FIGURE "B"
     #define ROOK_FIGURE "R"
     #define QUEEN_FIGURE "Q"
