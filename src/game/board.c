@@ -17,6 +17,10 @@ void show_board(struct Game* game, int x, int y) {
         for (short j = 0; j < 8; j++) {
             char_to_process = game->board[i*8+j];
 
+            if (char_to_process >= 'a') {
+                char_to_process -= 32;
+                is_black = 2;
+            }
             if (is_black_square == 0) {
                 is_black_square = 1;
                 attroff(COLOR_PAIR(1));
@@ -28,10 +32,7 @@ void show_board(struct Game* game, int x, int y) {
                 attroff(COLOR_PAIR(4));
                 attron(COLOR_PAIR(1+is_black));
             }
-            if (char_to_process >= 'a') {
-                char_to_process -= 32;
-                is_black = 2;
-            }
+
             switch (char_to_process) {
                 case 'P': // Pawn
                     printw(FIGURE_STRING, PAWN_FIGURE);
