@@ -15,7 +15,11 @@ void show_board(struct Game* game, int x, int y) {
     short row = 1;
     for (short i = 0; i < 8; i++) {
         for (short j = 0; j < 8; j++) {
-            char_to_process = game->board[i*8+j];
+            if (game->is_black == 1) {
+                char_to_process = game->board[63-(i*8+j)];
+            } else {
+                char_to_process = game->board[i*8+j];
+            }            
 
             if (char_to_process >= 'a') {
                 char_to_process -= 32;

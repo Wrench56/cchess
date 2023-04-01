@@ -6,6 +6,7 @@ struct Game {
     char board[65];
     char white_name[32];
     char black_name[32];
+    short is_black;
 };
 
 void game_stream(char* api_key, char* game_id);

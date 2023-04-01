@@ -93,6 +93,7 @@ size_t parse_game_stream(char* buffer, size_t size, size_t nmemb, void* userp)
         return realsize;
     }
 
+    /* TODO: Check if Board API is enabled! (Or else: segfault) */
     cJSON* type = cJSON_GetObjectItemCaseSensitive(json, "type");
     
     if (strcmp(type->valuestring, "gameState") == 0) {
@@ -108,10 +109,19 @@ size_t parse_game_stream(char* buffer, size_t size, size_t nmemb, void* userp)
         cJSON* white = cJSON_GetObjectItemCaseSensitive(json, "white");
         cJSON* w_name = cJSON_GetObjectItemCaseSensitive(white, "name");
         cJSON* black = cJSON_GetObjectItemCaseSensitive(json, "black");
-        cJSON* b_name = cJSON_GetObjectItemCaseSensitive(white, "name");
+        cJSON* b_name = cJSON_GetObjectItemCaseSensitive(black, "name");
 
         strcpy(game->white_name, w_name->valuestring);
         strcpy(game->black_name, b_name->valuestring);
+
+        cJSON* account = get_request(game->api_key, "https://lichess.org/api/account");
+        cJSON* username = cJSON_GetObjectItemCaseSensitive(account, "username");
+
+        if (strcmp(game->black_name, username->valuestring) == 0) {
+            game->is_black = 1;
+        } else {
+            game->is_black = 0;
+        }
 
         cJSON* state = cJSON_GetObjectItemCaseSensitive(json, "state");
         cJSON* moves = cJSON_GetObjectItemCaseSensitive(state, "moves");
