@@ -101,6 +101,7 @@ size_t parse_game_stream(char* buffer, size_t size, size_t nmemb, void* userp)
 
         parse_move(game, moves->valuestring  + strlen(moves->valuestring) - 4);
         game->num_moves++;
+        game->change_flag++;
 
     } else if (strcmp(type->valuestring, "opponentGone") == 0) {
 

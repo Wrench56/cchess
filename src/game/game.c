@@ -20,9 +20,13 @@ void game_stream(char* api_key, char* game_id) {
     pthread_t api_thread;
     struct Game game;
 
+    /* Copy existing data */
     strcpy(game.api_key, api_key);
     strcpy(game.game_id, game_id);
+    
+    /* Set default values */
     game.is_black = 2;
+    game.change_flag = 0;
 
     /* Set starting board */
     strcpy(game.board, "rnbqkbnrpppppppp00000000000000000000000000000000PPPPPPPPRNBQKBNR");
@@ -43,9 +47,27 @@ void game_stream(char* api_key, char* game_id) {
     show_board(&game, 1, 1);
     refresh();
 
-    getch();
+    /* Mainloop */
+    timeout(10);
+    char key = '\0';
+
+    while (1) {
+        key = getch();
+        if (key == 'q') {
+            break;
+        }
+        if (game.change_flag == 1) {
+            /* Handle change */
+            show_board(&game, 1, 1);
+            refresh();
+
+            game.change_flag = 0;
+        }
+    }
 
     /* Cleanup */
+    timeout(-1);
+
     attroff(COLOR_PAIR(1));
     attroff(COLOR_PAIR(2));
     attroff(COLOR_PAIR(3));
