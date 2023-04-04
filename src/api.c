@@ -100,8 +100,7 @@ size_t parse_game_stream(char* buffer, size_t size, size_t nmemb, void* userp)
         cJSON* moves = cJSON_GetObjectItemCaseSensitive(json, "moves");
 
         parse_move(game, moves->valuestring  + strlen(moves->valuestring) - 4);
-        show_board(game, 1, 1);
-        refresh();
+        game->num_moves++;
 
     } else if (strcmp(type->valuestring, "opponentGone") == 0) {
 
@@ -114,19 +113,11 @@ size_t parse_game_stream(char* buffer, size_t size, size_t nmemb, void* userp)
         strcpy(game->white_name, w_name->valuestring);
         strcpy(game->black_name, b_name->valuestring);
 
-        cJSON* account = get_request(game->api_key, "https://lichess.org/api/account");
-        cJSON* username = cJSON_GetObjectItemCaseSensitive(account, "username");
-
-        if (strcmp(game->black_name, username->valuestring) == 0) {
-            game->is_black = 1;
-        } else {
-            game->is_black = 0;
-        }
-
         cJSON* state = cJSON_GetObjectItemCaseSensitive(json, "state");
         cJSON* moves = cJSON_GetObjectItemCaseSensitive(state, "moves");
 
         if (strlen(moves->valuestring) == 4) {
+            game->num_moves++;
             parse_move(game, moves->valuestring);
         } else if (strlen(moves->valuestring) > 4) {
             // Extract the first token
@@ -135,11 +126,19 @@ size_t parse_game_stream(char* buffer, size_t size, size_t nmemb, void* userp)
             // loop through the string to extract all other tokens
             while( move_ != NULL ) {
                 parse_move(game, move_);
+                game->num_moves++;
                 move_ = strtok(NULL, " ");
             }
         }
-        show_board(game, 1, 1);
-        refresh();
+
+        cJSON* account = get_request(game->api_key, "https://lichess.org/api/account");
+        cJSON* username = cJSON_GetObjectItemCaseSensitive(account, "username");
+
+        if (strcmp(game->black_name, username->valuestring) == 0) {
+            game->is_black = 1;
+        } else {
+            game->is_black = 0;
+        }
 
     } else { // chatLine
 
