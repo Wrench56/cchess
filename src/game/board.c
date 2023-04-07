@@ -6,6 +6,9 @@
 #include "game.h"
 
 
+#define CHECK_BIT(var,pos) ((var) & (1<<(pos)))
+
+
 void show_board(struct Game* game, int x, int y) {
     char char_to_process;
     short is_black = 0;
@@ -15,7 +18,7 @@ void show_board(struct Game* game, int x, int y) {
     /* Draw ranks & files (numbers and characters) */
 
     if (game->is_black) {
-        mvprintw(y + 8, x + 3, "H G F E D C A B");
+        mvprintw(y + 8, x + 3, "H G F E D C B A");
         for (short i = 8; i > 0; i--) {
             mvprintw(y + i - 1, x, "%c", (i + 48));
         }
@@ -117,10 +120,12 @@ void parse_move(struct Game* game, char* move_pair) {
 
 void show_valid_moves(struct Game* game, char* piece_location) {
     short is_black = 0;
+    unsigned short state;
 
     short rank = 56 - (piece_location[1] - 49) * 8;
     short file = piece_location[0] - 97;
     char piece = game->board[rank + file];
+    
 
     if (piece >= 'a') {
         piece -= 32;
@@ -139,8 +144,6 @@ void show_valid_moves(struct Game* game, char* piece_location) {
                     }
                 }
             } else {
-                move(1, 15);
-                printw("%c", game->board[rank+file+8]);
                 if (game->board[rank+file+8] == '0') {
                     game->board[rank + file + 8] = '@';
                     if (rank == 8 && is_black) {
@@ -149,6 +152,97 @@ void show_valid_moves(struct Game* game, char* piece_location) {
                         }
                     }
                 }
+            }
+            break;
+
+        case 'R': // Rook
+            state = 15;
+
+            for (short i = 1; i < 8; i++) {
+                /* Horizontal */
+                if (CHECK_BIT(state, 0)) {
+                    if (file+i < 8 && game->board[rank+file+i] == '0') {
+                        game->board[rank+file+i] = '@';
+                    } else {
+                        state -= 1;
+                    }
+                }
+                if (CHECK_BIT(state, 1)) {
+                    if (file+i > -1 && game->board[rank+file-i] == '0') {
+                        game->board[rank+file-i] = '@';
+                    } else {
+                        state -= 2;
+                    }
+                }
+
+                /* Vertical */
+                if (CHECK_BIT(state, 2)) {
+                    if (rank + i*8 < 63 && game->board[rank+file+i*8] == '0') {
+                        game->board[rank+file+i*8] = '@';
+                    } else {
+                        state -= 4;
+                    }
+                }
+                if (CHECK_BIT(state, 3)) {
+                    if (rank - i*8 > 7 && game->board[rank+file-i*8] == '0') {
+                        game->board[rank+file-i*8] = '@';
+                    } else {
+                        state -= 8;
+                    }
+                }
+
+                /* Break when everything is done! */
+                if (!state) break;
+            }
+            break;
+        case 'B': // Bishop
+            state = 15;
+
+            for (short i = 1; i < 8; i++) {
+                if (CHECK_BIT(state, 0)) {
+                    if (rank+file+i*7 < 64 && game->board[rank+file+i*7] == '0') {
+                        game->board[rank+file+i*7] = '@';
+                    } else {
+                        state -= 1;
+                    }
+                }
+                if (CHECK_BIT(state, 1)) {
+                    if (rank+file+i*9 < 64 && game->board[rank+file+i*9] == '0') {
+                        game->board[rank+file+i*9] = '@';
+                    } else {
+                        state -= 2;
+                    }
+                }
+                if (CHECK_BIT(state, 2)) {
+                    if (rank+file-i*7 > -1 && game->board[rank+file-i*7] == '0') {
+                        game->board[rank+file-i*7] = '@';
+                        if ((rank+file+1-i*7) % 8 == 0) {
+                            state -= 4;
+                        } else if ((rank+file-i*7) % 8 == 0) {
+                            state -= 4;
+                        }
+                    } else {
+                        state -= 4;
+                    }
+                }                
+                if (CHECK_BIT(state, 3)) {
+                    if (rank+file-i*9 > -1 && game->board[rank+file-i*9] == '0') {
+                        game->board[rank+file-i*9] = '@';
+                        if ((rank+file+1-i*9) % 8 == 0) {
+                            state -= 8;
+                        } else if ((rank+file-i*9) % 8 == 0) {
+                            state -= 8;
+                        }
+                    } else {
+                        state -= 8;
+                    }
+                }
+                
+                
+                
+
+                /* Break when everything is done! */
+                if (!state) break;
             }
             break;
     }
