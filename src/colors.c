@@ -18,4 +18,7 @@ void init_colors() {
     
     init_pair(9, WHITE_SQUARE_COLOR, -1);
     init_pair(10, BLACK_SQUARE_COLOR, -1);
+
+    init_pair(11, COLOR_YELLOW, WHITE_SQUARE_COLOR);
+    init_pair(12, COLOR_YELLOW, BLACK_SQUARE_COLOR);
 }

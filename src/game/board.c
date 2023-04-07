@@ -34,7 +34,7 @@ void show_board(struct Game* game, int x, int y) {
                 char_to_process = game->board[63-(i*8+j)];
             } else {
                 char_to_process = game->board[i*8+j];
-            }            
+            }
 
             if (char_to_process >= 'a') {
                 char_to_process -= 32;
@@ -73,6 +73,19 @@ void show_board(struct Game* game, int x, int y) {
                     break;
                 case '0': // Space
                     printw(FIGURE_STRING, " ");
+                    break;
+                case '@': // Possible move
+                    if (is_black_square == 0) {
+                        attron(COLOR_PAIR(11));
+                    } else {
+                        attron(COLOR_PAIR(12));
+                    }
+                    printw(FIGURE_STRING, POSSIBLE_MOVE_STRING);
+                    if (game->is_black == 1) {
+                        game->board[63-(i*8+j)] = '0';
+                    } else {
+                        game->board[i*8+j] = '0';
+                    }            
                     break;
                 default:
                     printw("Er");

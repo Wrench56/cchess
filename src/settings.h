@@ -34,12 +34,18 @@
     #define CORRESPONDENCE_SYMBOL ""
     #define CLASSICAL_SYMBOL ""
     #define RAPID_SYMBOL ""
+
+    #define POSSIBLE_MOVE_STRING ""
+
 #else
     #define BLITZ_SYMBOL ""
     #define BULLET_SYMBOL ""
     #define CORRESPONDENCE_SYMBOL ""
     #define CLASSICAL_SYMBOL ""
     #define RAPID_SYMBOL ""
+
+    #define POSSIBLE_MOVE_STRING "*"
+    
 #endif
 
 #define AUTOLOGIN_KEY "cchess_key"
