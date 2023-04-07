@@ -87,7 +87,7 @@ void game_stream(char* api_key, char* game_id) {
             }
             
         }
-        if (game.change_flag > 1) {
+        if (game.change_flag >= 1) {
             /* Handle change */
             show_board(&game, 1, 1);
             refresh();
