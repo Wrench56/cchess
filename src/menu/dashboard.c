@@ -66,7 +66,7 @@ short show_dashboard(char* api_key) {
 
     cJSON *name = cJSON_GetObjectItemCaseSensitive(json, "username");
     if (name == NULL) {
-        error("Invalid JSON");
+        error("Invalid JSON @dash::username");
         return 1;
     }
     
@@ -97,7 +97,7 @@ short show_dashboard(char* api_key) {
     /* Show last seen */
     cJSON* seen_at = cJSON_GetObjectItemCaseSensitive(json, "seenAt");
     if (seen_at == NULL) {
-        error("Invalid JSON");
+        error("Invalid JSON @dash::seen_at");
         return 1;
     }
 
