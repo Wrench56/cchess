@@ -43,20 +43,28 @@ void game_stream(char* api_key, char* game_id) {
     } else {
         mvprintw(0, 2, "%s", game.black_name);
     }
-    mvprintw(9, 2, "You");
+    mvprintw(10, 2, "You");
     show_board(&game, 1, 1);
     refresh();
 
     /* Mainloop */
-    timeout(10);
+    timeout(1);
     char key = '\0';
+    short current_pos = 0;
 
     while (1) {
         key = getch();
         if (key == 'q') {
             break;
         }
-        if (game.change_flag == 1) {
+        if ((key >= '0' && key <= '9') || (key >='A' && key <= 'H') || (key >= 'a' && key <= 'h')) {
+            /* New select/move via keyboard */
+            mvprintw(7, 20 + current_pos, "%c", key);
+            current_pos++;
+
+            refresh();
+        }
+        if (game.change_flag > 1) {
             /* Handle change */
             show_board(&game, 1, 1);
             refresh();

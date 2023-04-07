@@ -11,8 +11,16 @@ void show_board(struct Game* game, int x, int y) {
     short is_black = 0;
     short is_black_square = 1;
 
-    move(y, x);
     short row = 1;
+    /* Draw ranks & files (numbers and characters) */
+
+    mvprintw(y + 8, x + 3, "A B C D E F G H");
+    for (short i = 0; i < 8; i++) {
+        mvprintw(y + i, x, "%c", (i + 49));
+    }
+
+    move(y, x + 2);
+
     for (short i = 0; i < 8; i++) {
         for (short j = 0; j < 8; j++) {
             if (game->is_black == 1) {
@@ -66,9 +74,13 @@ void show_board(struct Game* game, int x, int y) {
             is_black = 0;
         }
         is_black_square = !is_black_square;
-        move(y+row, x);
+        move(y + row, x + 2);
         row++;
     }
+
+    /* Cleanup */
+    attroff(COLOR_PAIR(1));
+    attroff(COLOR_PAIR(3));
 }
 
 
