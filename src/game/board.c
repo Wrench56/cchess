@@ -164,7 +164,7 @@ void show_valid_moves(struct Game* game, char* piece_location) {
             for (short i = 1; i < 8; i++) {
                 /* Horizontal */
                 if (CHECK_BIT(state, 0)) {
-                    if (i <= 8-file && game->board[rank+file+i] == '0') {
+                    if (i < 8-file && game->board[rank+file+i] == '0') {
                         game->board[rank+file+i] = '@';
                     } else {
                         state -= 1;
@@ -243,7 +243,7 @@ void show_valid_moves(struct Game* game, char* piece_location) {
             for (short i = 1; i < 8; i++) {
                 /* Horizontal */
                 if (CHECK_BIT(state, 0)) {
-                    if (i <= 8-file && game->board[rank+file+i] == '0') {
+                    if (i < 8-file && game->board[rank+file+i] == '0') {
                         game->board[rank+file+i] = '@';
                     } else {
                         state -= 1;
