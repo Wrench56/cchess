@@ -350,5 +350,24 @@ void show_valid_moves(struct Game* game, char* piece_location) {
                 if (!state) break;
             }
             break;
+
+        case 'K': // King
+            for (short i = 0; i < 3; i++) {
+                if (rank+file+7+i < 64 && game->board[rank+file+7+i] == '0') {
+                    game->board[rank+file+7+i] = '@';
+                }
+            }
+            for (short i = 0; i < 3; i++) {
+                if (rank+file-7-i > -1 && game->board[rank+file-7-i] == '0') {
+                    game->board[rank+file-7-i] = '@';
+                }
+            }
+            if (rank+file+1 < 64 && game->board[rank+file+1] == '0') {
+                game->board[rank+file+1] = '@';
+            }
+            if (rank+file-1 > -1 && game->board[rank+file-1] == '0') {
+                game->board[rank+file-1] = '@';
+            }
+            break;
     }
 }
