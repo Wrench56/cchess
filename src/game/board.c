@@ -202,6 +202,11 @@ void show_valid_moves(struct Game* game, char* piece_location) {
                 if (CHECK_BIT(state, 0)) {
                     if (rank+file+i*7 < 64 && game->board[rank+file+i*7] == '0') {
                         game->board[rank+file+i*7] = '@';
+                        if ((rank+file+i*7) % 8 == 0) {
+                            state -= 1;
+                        } else if ((rank+file+i*7) % 8 == 0) {
+                            state -= 1;
+                        }
                     } else {
                         state -= 1;
                     }
@@ -209,6 +214,11 @@ void show_valid_moves(struct Game* game, char* piece_location) {
                 if (CHECK_BIT(state, 1)) {
                     if (rank+file+i*9 < 64 && game->board[rank+file+i*9] == '0') {
                         game->board[rank+file+i*9] = '@';
+                        if ((rank+file+1+i*9) % 8 == 0) {
+                            state -= 2;
+                        } else if ((rank+file+i*9) % 8 == 0) {
+                            state -= 2;
+                        }
                     } else {
                         state -= 2;
                     }
@@ -237,13 +247,106 @@ void show_valid_moves(struct Game* game, char* piece_location) {
                         state -= 8;
                     }
                 }
-                
-                
-                
 
                 /* Break when everything is done! */
                 if (!state) break;
             }
             break;
+
+        case 'Q':
+        state = 15;
+
+            for (short i = 1; i < 8; i++) {
+                /* Horizontal */
+                if (CHECK_BIT(state, 0)) {
+                    if (file+i < 8 && game->board[rank+file+i] == '0') {
+                        game->board[rank+file+i] = '@';
+                    } else {
+                        state -= 1;
+                    }
+                }
+                if (CHECK_BIT(state, 1)) {
+                    if (file+i > -1 && game->board[rank+file-i] == '0') {
+                        game->board[rank+file-i] = '@';
+                    } else {
+                        state -= 2;
+                    }
+                }
+
+                /* Vertical */
+                if (CHECK_BIT(state, 2)) {
+                    if (rank + i*8 < 63 && game->board[rank+file+i*8] == '0') {
+                        game->board[rank+file+i*8] = '@';
+                    } else {
+                        state -= 4;
+                    }
+                }
+                if (CHECK_BIT(state, 3)) {
+                    if (rank - i*8 > 7 && game->board[rank+file-i*8] == '0') {
+                        game->board[rank+file-i*8] = '@';
+                    } else {
+                        state -= 8;
+                    }
+                }
+
+                /* Break when everything is done! */
+                if (!state) break;
+            }
+            break;
+            state = 15;
+            
+            for (short i = 1; i < 8; i++) {
+                if (CHECK_BIT(state, 0)) {
+                    if (rank+file+i*7 < 64 && game->board[rank+file+i*7] == '0') {
+                        game->board[rank+file+i*7] = '@';
+                        if ((rank+file+i*7) % 8 == 0) {
+                            state -= 1;
+                        } else if ((rank+file+i*7) % 8 == 0) {
+                            state -= 1;
+                        }
+                    } else {
+                        state -= 1;
+                    }
+                }
+                if (CHECK_BIT(state, 1)) {
+                    if (rank+file+i*9 < 64 && game->board[rank+file+i*9] == '0') {
+                        game->board[rank+file+i*9] = '@';
+                        if ((rank+file+1+i*9) % 8 == 0) {
+                            state -= 2;
+                        } else if ((rank+file+i*9) % 8 == 0) {
+                            state -= 2;
+                        }
+                    } else {
+                        state -= 2;
+                    }
+                }
+                if (CHECK_BIT(state, 2)) {
+                    if (rank+file-i*7 > -1 && game->board[rank+file-i*7] == '0') {
+                        game->board[rank+file-i*7] = '@';
+                        if ((rank+file+1-i*7) % 8 == 0) {
+                            state -= 4;
+                        } else if ((rank+file-i*7) % 8 == 0) {
+                            state -= 4;
+                        }
+                    } else {
+                        state -= 4;
+                    }
+                }                
+                if (CHECK_BIT(state, 3)) {
+                    if (rank+file-i*9 > -1 && game->board[rank+file-i*9] == '0') {
+                        game->board[rank+file-i*9] = '@';
+                        if ((rank+file+1-i*9) % 8 == 0) {
+                            state -= 8;
+                        } else if ((rank+file-i*9) % 8 == 0) {
+                            state -= 8;
+                        }
+                    } else {
+                        state -= 8;
+                    }
+                }
+
+                /* Break when everything is done! */
+                if (!state) break;
+            }
     }
 }
