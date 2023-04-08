@@ -164,14 +164,14 @@ void show_valid_moves(struct Game* game, char* piece_location) {
             for (short i = 1; i < 8; i++) {
                 /* Horizontal */
                 if (CHECK_BIT(state, 0)) {
-                    if (file+i < 8 && game->board[rank+file+i] == '0') {
+                    if (rank+file+i <= rank+file+8-file && game->board[rank+file+i] == '0') {
                         game->board[rank+file+i] = '@';
                     } else {
                         state -= 1;
                     }
                 }
                 if (CHECK_BIT(state, 1)) {
-                    if (file+i > -1 && game->board[rank+file-i] == '0') {
+                    if (rank+file-i >= rank+file-(file % 8) && game->board[rank+file-i] == '0') {
                         game->board[rank+file-i] = '@';
                     } else {
                         state -= 2;
@@ -259,12 +259,10 @@ void show_valid_moves(struct Game* game, char* piece_location) {
         case 'Q':
             state = 15;
 
-            state = 15;
-
             for (short i = 1; i < 8; i++) {
                 /* Horizontal */
                 if (CHECK_BIT(state, 0)) {
-                    if (file+i < 8 && game->board[rank+file+i] == '0') {
+                    if (file+i < 64 && game->board[rank+file+i] == '0') {
                         game->board[rank+file+i] = '@';
                     } else {
                         state -= 1;
@@ -280,7 +278,7 @@ void show_valid_moves(struct Game* game, char* piece_location) {
 
                 /* Vertical */
                 if (CHECK_BIT(state, 2)) {
-                    if (rank + i*8 < 63 && game->board[rank+file+i*8] == '0') {
+                    if (rank + i*8 < 64 && game->board[rank+file+i*8] == '0') {
                         game->board[rank+file+i*8] = '@';
                     } else {
                         state -= 4;
@@ -298,7 +296,7 @@ void show_valid_moves(struct Game* game, char* piece_location) {
                 if (!state) break;
             }
             state = 15;
-            
+
             for (short i = 1; i < 8; i++) {
                 if (CHECK_BIT(state, 0)) {
                     if (rank+file+i*7 < 64 && game->board[rank+file+i*7] == '0') {
