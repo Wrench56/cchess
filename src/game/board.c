@@ -184,7 +184,7 @@ void show_valid_moves(struct Game* game, char* piece_location) {
                     }
                 }
                 if (CHECK_BIT(state, 3)) {
-                    if (rank - i*8 > 7 && game->board[rank+file-i*8] == '0') {
+                    if (rank - i*8 > -1 && game->board[rank+file-i*8] == '0') {
                         game->board[rank+file-i*8] = '@';
                     } else {
                         state -= 8;
