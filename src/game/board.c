@@ -7,6 +7,9 @@
 
 
 #define CHECK_BIT(var,pos) ((var) & (1<<(pos)))
+#define KNIGHT_MULTIPLIER_CALC(i) ((i > 1) ? 2 : 1)
+
+const short KNIGHT_OFFSETS[4] = {6, 10, 15, 17};
 
 
 void show_board(struct Game* game, int x, int y) {
@@ -25,7 +28,7 @@ void show_board(struct Game* game, int x, int y) {
     } else {
         mvprintw(y + 8, x + 3, "A B C D E F G H");
         for (short i = 0; i < 8; i++) {
-            mvprintw(y + i, x, "%c", (i + 49));
+            mvprintw(y + 7 - i, x, "%c", (i + 49));
         }
     }
 
@@ -369,5 +372,24 @@ void show_valid_moves(struct Game* game, char* piece_location) {
                 game->board[rank+file-1] = '@';
             }
             break;
+        
+        case 'N': // Knight
+            for (short i = 0; i < 8; i++) {
+                
+                if (rank+file+KNIGHT_OFFSETS[i] <= rank+file+8-file+KNIGHT_MULTIPLIER_CALC(i)*8) {
+                    if (rank+file+KNIGHT_OFFSETS[i] < 64 && game->board[rank+file+KNIGHT_OFFSETS[i]] == '0') {
+                        game->board[rank+file+KNIGHT_OFFSETS[i]] = '@';
+                    }
+                }
+                if (rank+file-KNIGHT_OFFSETS[i] >= rank+file-(file%8)-KNIGHT_MULTIPLIER_CALC(i)*8) {
+                    if (rank+file-KNIGHT_OFFSETS[i] > -1 && game->board[rank+file-KNIGHT_OFFSETS[i]] == '0') {
+                        game->board[rank+file-KNIGHT_OFFSETS[i]] = '@';
+                    }
+                }
+            }
+            break;
+
+        default:
+            break;   
     }
 }
