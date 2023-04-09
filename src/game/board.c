@@ -337,13 +337,13 @@ void show_valid_moves(struct Game* game, char* piece_location) {
         case 'N': // Knight
             for (short i = 0; i < 8; i++) {
                 
-                if (rank+file+KNIGHT_OFFSETS[i] <= rank+file+8-file+KNIGHT_MULTIPLIER_CALC(i)) {
-                    if (rank+file+KNIGHT_OFFSETS[i] < 64 && game->board[rank+file+KNIGHT_OFFSETS[i]] == '0') {
+                if (KNIGHT_OFFSETS[i] <= -file+KNIGHT_MULTIPLIER_CALC(i)) {
+                    if (game->board[rank+file+KNIGHT_OFFSETS[i]] == '0') {
                         game->board[rank+file+KNIGHT_OFFSETS[i]] = '@';
                     }
                 }
-                if (rank+file-KNIGHT_OFFSETS[i] >= rank+file-(file%8)-KNIGHT_MULTIPLIER_CALC(i)) {
-                    if (rank+file-KNIGHT_OFFSETS[i] > -1 && game->board[rank+file-KNIGHT_OFFSETS[i]] == '0') {
+                if (-KNIGHT_OFFSETS[i] >= -(file%8)-KNIGHT_MULTIPLIER_CALC(i)) {
+                    if (game->board[rank+file-KNIGHT_OFFSETS[i]] == '0') {
                         game->board[rank+file-KNIGHT_OFFSETS[i]] = '@';
                     }
                 }
