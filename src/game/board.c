@@ -318,15 +318,15 @@ void show_valid_moves(struct Game* game, char* piece_location) {
 
         case 'K': // King
             for (short i = 0; i < 8; i++) {
-                if (rank+file+KING_OFFSETS[i] >= rank+file-(file%8)+KING_MULTIPLIER_CALC(i) &&
-                        rank+file+KING_OFFSETS[i] < rank+file+8-file+KING_MULTIPLIER_CALC(i)) {
+                if (KING_OFFSETS[i] >= -(file%8)+KING_MULTIPLIER_CALC(i) &&
+                        KING_OFFSETS[i] < 8-file+KING_MULTIPLIER_CALC(i)) {
                     if (game->board[rank+file+KING_OFFSETS[i]] == '0') {
                         game->board[rank+file+KING_OFFSETS[i]] = '@';
                     }
                 }
-                if (rank+file-KING_OFFSETS[i] >= rank+file-(file%8)-KING_MULTIPLIER_CALC(i) &&
-                        rank+file-KING_OFFSETS[i] < rank+file+8-file-KING_MULTIPLIER_CALC(i)) {
-                    if (rank+file-KING_OFFSETS[i] > -1 && game->board[rank+file-KING_OFFSETS[i]] == '0') {
+                if (-KING_OFFSETS[i] >= -(file%8)-KING_MULTIPLIER_CALC(i) &&
+                        -KING_OFFSETS[i] < 8-file-KING_MULTIPLIER_CALC(i)) {
+                    if (game->board[rank+file-KING_OFFSETS[i]] == '0') {
                         game->board[rank+file-KING_OFFSETS[i]] = '@';
                     }
                 }
