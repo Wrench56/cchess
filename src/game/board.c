@@ -7,9 +7,11 @@
 
 
 #define CHECK_BIT(var,pos) ((var) & (1<<(pos)))
-#define KNIGHT_MULTIPLIER_CALC(i) ((i > 1) ? 2 : 1)
+#define KNIGHT_MULTIPLIER_CALC(i) ((i > 1) ? 16 : 8)
+#define KING_MULTIPLIER_CALC(i) ((i == 0) ? 0 : 8)
 
 const short KNIGHT_OFFSETS[4] = {6, 10, 15, 17};
+const short KING_OFFSETS[4] = {1, 7, 8, 9};
 
 
 void show_board(struct Game* game, int x, int y) {
@@ -315,33 +317,32 @@ void show_valid_moves(struct Game* game, char* piece_location) {
             break;
 
         case 'K': // King
-            for (short i = 0; i < 3; i++) {
-                if (rank+file+7+i < 64 && game->board[rank+file+7+i] == '0') {
-                    game->board[rank+file+7+i] = '@';
+            for (short i = 0; i < 8; i++) {
+                if (rank+file+KING_OFFSETS[i] >= rank+file-(file%8)+KING_MULTIPLIER_CALC(i) &&
+                        rank+file+KING_OFFSETS[i] < rank+file+8-file+KING_MULTIPLIER_CALC(i)) {
+                    if (game->board[rank+file+KING_OFFSETS[i]] == '0') {
+                        game->board[rank+file+KING_OFFSETS[i]] = '@';
+                    }
                 }
-            }
-            for (short i = 0; i < 3; i++) {
-                if (rank+file-7-i > -1 && game->board[rank+file-7-i] == '0') {
-                    game->board[rank+file-7-i] = '@';
+                if (rank+file-KING_OFFSETS[i] >= rank+file-(file%8)-KING_MULTIPLIER_CALC(i) &&
+                        rank+file-KING_OFFSETS[i] < rank+file+8-file-KING_MULTIPLIER_CALC(i)) {
+                    if (rank+file-KING_OFFSETS[i] > -1 && game->board[rank+file-KING_OFFSETS[i]] == '0') {
+                        game->board[rank+file-KING_OFFSETS[i]] = '@';
+                    }
                 }
-            }
-            if (rank+file+1 < 64 && game->board[rank+file+1] == '0') {
-                game->board[rank+file+1] = '@';
-            }
-            if (rank+file-1 > -1 && game->board[rank+file-1] == '0') {
-                game->board[rank+file-1] = '@';
+                
             }
             break;
         
         case 'N': // Knight
             for (short i = 0; i < 8; i++) {
                 
-                if (rank+file+KNIGHT_OFFSETS[i] <= rank+file+8-file+KNIGHT_MULTIPLIER_CALC(i)*8) {
+                if (rank+file+KNIGHT_OFFSETS[i] <= rank+file+8-file+KNIGHT_MULTIPLIER_CALC(i)) {
                     if (rank+file+KNIGHT_OFFSETS[i] < 64 && game->board[rank+file+KNIGHT_OFFSETS[i]] == '0') {
                         game->board[rank+file+KNIGHT_OFFSETS[i]] = '@';
                     }
                 }
-                if (rank+file-KNIGHT_OFFSETS[i] >= rank+file-(file%8)-KNIGHT_MULTIPLIER_CALC(i)*8) {
+                if (rank+file-KNIGHT_OFFSETS[i] >= rank+file-(file%8)-KNIGHT_MULTIPLIER_CALC(i)) {
                     if (rank+file-KNIGHT_OFFSETS[i] > -1 && game->board[rank+file-KNIGHT_OFFSETS[i]] == '0') {
                         game->board[rank+file-KNIGHT_OFFSETS[i]] = '@';
                     }
