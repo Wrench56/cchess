@@ -18,6 +18,7 @@ void show_board(struct Game* game, int x, int y) {
     char char_to_process;
     short is_black = 0;
     short is_black_square = 1;
+    short target_square = 0;
 
     short row = 1;
     /* Draw ranks & files (numbers and characters) */
@@ -43,21 +44,42 @@ void show_board(struct Game* game, int x, int y) {
             } else {
                 char_to_process = game->board[i*8+j];
             }
+                
+            /* Target flag set */
+            if (CHECK_BIT(char_to_process, 7)) {
+                target_square = 1;
+                char_to_process -= 128;
+            }
 
             if (char_to_process >= 'a') {
                 char_to_process -= 32;
                 is_black = 2;
             }
-            if (is_black_square == 0) {
-                is_black_square = 1;
-                attroff(COLOR_PAIR(1));
-                attroff(COLOR_PAIR(3));
-                attron(COLOR_PAIR(2+is_black));
+
+            
+
+            if (!target_square) {
+                if (is_black_square == 0) {
+                    is_black_square = 1;
+                    attroff(COLOR_PAIR(1));
+                    attroff(COLOR_PAIR(3));
+                    attron(COLOR_PAIR(2+is_black));
+                } else {
+                    is_black_square = 0;
+                    attroff(COLOR_PAIR(2));
+                    attroff(COLOR_PAIR(4));
+                    attron(COLOR_PAIR(1+is_black));
+                }
             } else {
-                is_black_square = 0;
-                attroff(COLOR_PAIR(2));
-                attroff(COLOR_PAIR(4));
-                attron(COLOR_PAIR(1+is_black));
+                attron(COLOR_PAIR(13+is_black));
+                is_black_square = !is_black_square;
+                target_square = 0;
+                /* Clear target squares*/
+                if (game->is_black == 1) {
+                    game->board[63-(i*8+j)] = char_to_process + is_black * 16; // Got to add 32 if is_black == 2; (2 = true)
+                } else {
+                    game->board[i*8+j] = char_to_process + is_black * 16;
+            }
             }
 
             switch (char_to_process) {
@@ -96,7 +118,7 @@ void show_board(struct Game* game, int x, int y) {
                     }            
                     break;
                 default:
-                    printw("Er");
+                    printw("%i", char_to_process);
                     break;
             }
             is_black = 0;
@@ -317,17 +339,23 @@ void show_valid_moves(struct Game* game, char* piece_location) {
             break;
 
         case 'K': // King
-            for (short i = 0; i < 8; i++) {
+            for (short i = 0; i < 4; i++) {
                 if (KING_OFFSETS[i] >= -(file%8)+KING_MULTIPLIER_CALC(i) &&
-                        KING_OFFSETS[i] < 8-file+KING_MULTIPLIER_CALC(i)) {
+                        KING_OFFSETS[i] < 8-file+KING_MULTIPLIER_CALC(i) && 
+                        rank+file+KING_OFFSETS[i] < 64) {
                     if (game->board[rank+file+KING_OFFSETS[i]] == '0') {
                         game->board[rank+file+KING_OFFSETS[i]] = '@';
+                    } else {
+                        game->board[rank+file+KING_OFFSETS[i]] += 128;
                     }
                 }
                 if (-KING_OFFSETS[i] >= -(file%8)-KING_MULTIPLIER_CALC(i) &&
-                        -KING_OFFSETS[i] < 8-file-KING_MULTIPLIER_CALC(i)) {
+                        -KING_OFFSETS[i] < 8-file-KING_MULTIPLIER_CALC(i) &&
+                        rank+file-KING_OFFSETS[i] > -1) {
                     if (game->board[rank+file-KING_OFFSETS[i]] == '0') {
                         game->board[rank+file-KING_OFFSETS[i]] = '@';
+                    } else {
+                        game->board[rank+file-KING_OFFSETS[i]] += 128;
                     }
                 }
                 
@@ -335,18 +363,24 @@ void show_valid_moves(struct Game* game, char* piece_location) {
             break;
         
         case 'N': // Knight
-            for (short i = 0; i < 8; i++) {
+            for (short i = 0; i < 4; i++) {
                 
                 if (KNIGHT_OFFSETS[i] >= -(file%8)+KNIGHT_MULTIPLIER_CALC(i) &&
-                        KNIGHT_OFFSETS[i] < 8-file+KNIGHT_MULTIPLIER_CALC(i)) {
-                    if (rank+file+KNIGHT_OFFSETS[i] < 64 && game->board[rank+file+KNIGHT_OFFSETS[i]] == '0') {
+                        KNIGHT_OFFSETS[i] < 8-file+KNIGHT_MULTIPLIER_CALC(i) && 
+                        rank+file+KNIGHT_OFFSETS[i] < 64) {
+                    if (game->board[rank+file+KNIGHT_OFFSETS[i]] == '0') {
                         game->board[rank+file+KNIGHT_OFFSETS[i]] = '@';
+                    } else {
+                        game->board[rank+file+KNIGHT_OFFSETS[i]] += 128;
                     }
                 }
                 if (-KNIGHT_OFFSETS[i] >= -(file%8)-KNIGHT_MULTIPLIER_CALC(i) &&
-                        -KNIGHT_OFFSETS[i] < 8-file-KNIGHT_MULTIPLIER_CALC(i)) {
-                    if (rank+file-KNIGHT_OFFSETS[i] > -1 && game->board[rank+file-KNIGHT_OFFSETS[i]] == '0') {
+                        -KNIGHT_OFFSETS[i] < 8-file-KNIGHT_MULTIPLIER_CALC(i) && 
+                        rank+file-KNIGHT_OFFSETS[i] > -1) {
+                    if (game->board[rank+file-KNIGHT_OFFSETS[i]] == '0') {
                         game->board[rank+file-KNIGHT_OFFSETS[i]] = '@';
+                    } else {
+                        game->board[rank+file-KNIGHT_OFFSETS[i]] += 128;
                     }
                 }
             }

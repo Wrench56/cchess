@@ -21,4 +21,8 @@ void init_colors() {
 
     init_pair(11, COLOR_YELLOW, WHITE_SQUARE_COLOR);
     init_pair(12, COLOR_YELLOW, BLACK_SQUARE_COLOR);
+
+    /* Target squares */
+    init_pair(13, WHITE_FIGURE_COLOR, COLOR_RED);
+    init_pair(15, BLACK_FIGURE_COLOR, COLOR_RED);
 }
