@@ -19,10 +19,11 @@ void init_colors() {
     init_pair(9, WHITE_SQUARE_COLOR, -1);
     init_pair(10, BLACK_SQUARE_COLOR, -1);
 
-    init_pair(11, COLOR_YELLOW, WHITE_SQUARE_COLOR);
-    init_pair(12, COLOR_YELLOW, BLACK_SQUARE_COLOR);
+    /* Possible move */
+    init_pair(11, POSSIBLE_SQUARE_FG, POSSIBLE_SQUARE_BG_WHITE);
+    init_pair(12, POSSIBLE_SQUARE_FG, POSSIBLE_SQUARE_BG_BLACK);
 
     /* Target squares */
-    init_pair(13, WHITE_FIGURE_COLOR, COLOR_RED);
-    init_pair(15, BLACK_FIGURE_COLOR, COLOR_RED);
+    init_pair(13, TARGET_SQUARE_FG_WHITE, TARGET_SQUARE_BACKGROUND);
+    init_pair(15, TARGET_SQUARE_FG_WHITE, TARGET_SQUARE_BACKGROUND);
 }
