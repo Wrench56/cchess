@@ -55,7 +55,6 @@ void show_board(struct Game* game, int x, int y) {
                 char_to_process -= 32;
                 is_black = 2;
             }
-
             
 
             if (!target_square) {
@@ -84,25 +83,25 @@ void show_board(struct Game* game, int x, int y) {
 
             switch (char_to_process) {
                 case 'P': // Pawn
-                    printw(FIGURE_STRING, PAWN_FIGURE);
+                    printw(FIGURE_STRING(j), PAWN_FIGURE);
                     break;
                 case 'R': // Rook
-                    printw(FIGURE_STRING, ROOK_FIGURE);
+                    printw(FIGURE_STRING(j), ROOK_FIGURE);
                     break;
                 case 'B': // Bishop
-                    printw(FIGURE_STRING, BISHOP_FIGURE);
+                    printw(FIGURE_STRING(j), BISHOP_FIGURE);
                     break;
                 case 'N': // Knight
-                    printw(FIGURE_STRING, KNIGHT_FIGURE);
+                    printw(FIGURE_STRING(j), KNIGHT_FIGURE);
                     break;
                 case 'Q': // Queen
-                    printw(FIGURE_STRING, QUEEN_FIGURE);
+                    printw(FIGURE_STRING(j), QUEEN_FIGURE);
                     break;
                 case 'K': // King
-                    printw(FIGURE_STRING, KING_FIGURE);
+                    printw(FIGURE_STRING(j), KING_FIGURE);
                     break;
                 case '0': // Space
-                    printw(FIGURE_STRING, " ");
+                    printw(FIGURE_STRING(0), " ");
                     break;
                 case '@': // Possible move
                     if (is_black_square == 0) {
@@ -110,7 +109,7 @@ void show_board(struct Game* game, int x, int y) {
                     } else {
                         attron(COLOR_PAIR(12));
                     }
-                    printw(FIGURE_STRING, POSSIBLE_MOVE_STRING);
+                    printw(POSSIBLE_MOVE_FORMAT, POSSIBLE_MOVE_STRING);
                     if (game->is_black == 1) {
                         game->board[63-(i*8+j)] = '0';
                     } else {
@@ -145,6 +144,28 @@ void parse_move(struct Game* game, char* move_pair) {
     game->board[rank + file] = piece;
 }
 
+
+short set_target(char attacking_figure, char* target_position) {
+    /* Check if the square fed to target_position is an actual target or
+       a field where it can move                                         */
+
+    if (*target_position == '0') {
+        *target_position = '@';
+        return 0;
+    }
+
+    short is_black = 0;
+    if (*target_position >= 'a') {
+        is_black = 1;
+    }
+
+    if (!(attacking_figure >= 'a' && is_black) && !((attacking_figure < 'a' && !is_black))) {
+        *target_position = (1 << 7) | *target_position;
+    }
+    return 1;
+}
+
+
 void show_valid_moves(struct Game* game, char* piece_location) {
     short is_black = 0;
     unsigned short state;
@@ -162,20 +183,34 @@ void show_valid_moves(struct Game* game, char* piece_location) {
     switch (piece) {
         case 'P': // Pawn
             if (!is_black) {
+                if (file > 0 && game->board[rank+file-9] > 'a' && game->board[rank+file-9] < 'z') {
+                    game->board[rank+file-9] = (1 << 7) | game->board[rank+file-9];   
+                }
+                if (file < 7 && game->board[rank+file-7] > 'a' && game->board[rank+file-7] < 'z') {
+                    game->board[rank+file-7] = (1 << 7) | game->board[rank+file-7];   
+                }
+
                 if (game->board[rank+file-8] == '0') {
-                    game->board[rank + file - 8] = '@';
+                    game->board[rank+file-8] = '@';
                     if (rank == 48 && !is_black) { // 2. rank
                         if (game->board[rank+file-16] == '0') {
-                            game->board[rank + file - 16] = '@'; // @-sign: valid move for selected piece
+                            game->board[rank+file-16] = '@'; // @-sign: valid move for selected piece
                         }
                     }
                 }
             } else {
+                if (file < 7 && game->board[rank+file+9] > 'A' && game->board[rank+file+9] < 'Z') {
+                    game->board[rank+file+9] = (1 << 7) | game->board[rank+file+9];   
+                }
+                if (file > 0 && game->board[rank+file+7] > 'A' && game->board[rank+file+7] < 'Z') {
+                    game->board[rank+file+7] = (1 << 7) | game->board[rank+file+7];   
+                }
+
                 if (game->board[rank+file+8] == '0') {
-                    game->board[rank + file + 8] = '@';
+                    game->board[rank+file+8] = '@';
                     if (rank == 8 && is_black) {
                         if (game->board[rank+file+16] == '0') {
-                            game->board[rank + file + 16] = '@'; // @-sign: valid move for selected piece
+                            game->board[rank+file+16] = '@'; // @-sign: valid move for selected piece
                         }
                     }
                 }
@@ -188,15 +223,19 @@ void show_valid_moves(struct Game* game, char* piece_location) {
             for (short i = 1; i < 8; i++) {
                 /* Horizontal */
                 if (CHECK_BIT(state, 0)) {
-                    if (i < 8-file && game->board[rank+file+i] == '0') {
-                        game->board[rank+file+i] = '@';
+                    if (i < 8-file) {
+                        if (set_target(game->board[rank+file], &game->board[rank+file+i])) {
+                            state--;
+                        }
                     } else {
-                        state -= 1;
+                        state--;
                     }
                 }
                 if (CHECK_BIT(state, 1)) {
-                    if (-i >= -(file % 8) && game->board[rank+file-i] == '0') {
-                        game->board[rank+file-i] = '@';
+                    if (-i >= -(file % 8)) {
+                        if (set_target(game->board[rank+file], &game->board[rank+file-i])) {
+                            state -= 2;
+                        }
                     } else {
                         state -= 2;
                     }
@@ -204,15 +243,19 @@ void show_valid_moves(struct Game* game, char* piece_location) {
 
                 /* Vertical */
                 if (CHECK_BIT(state, 2)) {
-                    if (rank + i*8 < 63 && game->board[rank+file+i*8] == '0') {
-                        game->board[rank+file+i*8] = '@';
+                    if (rank + i*8 < 63) {
+                        if (set_target(game->board[rank+file], &game->board[rank+file+i*8])) {
+                            state -= 4;
+                        }
                     } else {
                         state -= 4;
                     }
                 }
                 if (CHECK_BIT(state, 3)) {
-                    if (rank - i*8 > -1 && game->board[rank+file-i*8] == '0') {
-                        game->board[rank+file-i*8] = '@';
+                    if (rank - i*8 > -1) {
+                        if (set_target(game->board[rank+file], &game->board[rank+file-i*8])) {
+                            state -= 8;
+                        }
                     } else {
                         state -= 8;
                     }
@@ -227,32 +270,38 @@ void show_valid_moves(struct Game* game, char* piece_location) {
 
             for (short i = 1; i < 8; i++) {
                 if (CHECK_BIT(state, 0)) {
-                    if (i*7 >= 8-file+(i-1)*8 && game->board[rank+file+i*7] == '0') {
-                        game->board[rank+file+i*7] = '@';
+                    if (i*7 >= 8-file+(i-1)*8) {
+                        if (set_target(game->board[rank+file], &game->board[rank+file+i*7])) {
+                            state--;
+                        }
                     } else {
-                        state -= 1;
+                        state--;
                     }
                 }
                 if (CHECK_BIT(state, 1)) {
-                    if (i*9 <= 8-file+(i)*8 && game->board[rank+file+i*9] == '0') {
-                        game->board[rank+file+i*9] = '@';
+                    if (i*9 < 8-file+(i)*8) {
+                        if (set_target(game->board[rank+file], &game->board[rank+file+i*9])) {
+                            state -= 2;    
+                        }
                     } else {
                         state -= 2;
                     }
                 }
                 if (CHECK_BIT(state, 2)) {
-                    if (-i*7 <= -(file%8)-(i-1)*8 && rank+file-i*7 > -1 && game->board[rank+file-i*7] == '0') {
-                        game->board[rank+file-i*7] = '@';
+                    if (-i*7 < -(file%8)-(i-1)*8 && rank+file-i*7 > -1) {
+                        if (set_target(game->board[rank+file], &game->board[rank+file-i*7])) {
+                            state -= 4;
+                        }
                     } else {
                         state -= 4;
                     }
                 }    
                 
                 if (CHECK_BIT(state, 3)) {
-                    if (-i*9 >= -(file%8)-(i)*8 && game->board[rank+file-i*9] == '0') {
-                        game->board[rank+file-i*9] = '@';
-                    } else {
-                        state -= 8;
+                    if ((-i*9 >= -(file%8)-(i)*8)) {
+                        if (set_target(game->board[rank+file], &game->board[rank+file-i*9])) {
+                            state -= 8;
+                        }
                     }
                 }
 
@@ -267,15 +316,19 @@ void show_valid_moves(struct Game* game, char* piece_location) {
             for (short i = 1; i < 8; i++) {
                 /* Horizontal */
                 if (CHECK_BIT(state, 0)) {
-                    if (i < 8-file && game->board[rank+file+i] == '0') {
-                        game->board[rank+file+i] = '@';
+                    if (i < 8-file) {
+                        if (set_target(game->board[rank+file], &game->board[rank+file+i])) {
+                            state--;
+                        }
                     } else {
-                        state -= 1;
+                        state--;
                     }
                 }
                 if (CHECK_BIT(state, 1)) {
-                    if (-i >= -(file % 8) && game->board[rank+file-i] == '0') {
-                        game->board[rank+file-i] = '@';
+                    if (-i >= -(file % 8)) {
+                        if (set_target(game->board[rank+file], &game->board[rank+file-i])) {
+                            state -= 2;
+                        }
                     } else {
                         state -= 2;
                     }
@@ -283,15 +336,19 @@ void show_valid_moves(struct Game* game, char* piece_location) {
 
                 /* Vertical */
                 if (CHECK_BIT(state, 2)) {
-                    if (rank + i*8 < 63 && game->board[rank+file+i*8] == '0') {
-                        game->board[rank+file+i*8] = '@';
+                    if (rank + i*8 < 63) {
+                        if (set_target(game->board[rank+file], &game->board[rank+file+i*8])) {
+                            state -= 4;
+                        }
                     } else {
                         state -= 4;
                     }
                 }
                 if (CHECK_BIT(state, 3)) {
-                    if (rank - i*8 > -1 && game->board[rank+file-i*8] == '0') {
-                        game->board[rank+file-i*8] = '@';
+                    if (rank - i*8 > -1) {
+                        if (set_target(game->board[rank+file], &game->board[rank+file-i*8])) {
+                            state -= 8;
+                        }
                     } else {
                         state -= 8;
                     }
@@ -300,36 +357,42 @@ void show_valid_moves(struct Game* game, char* piece_location) {
                 /* Break when everything is done! */
                 if (!state) break;
             }
-            state = 15;
+                        state = 15;
 
             for (short i = 1; i < 8; i++) {
                 if (CHECK_BIT(state, 0)) {
-                    if (i*7 >= 8-file+(i-1)*8 && game->board[rank+file+i*7] == '0') {
-                        game->board[rank+file+i*7] = '@';
+                    if (i*7 >= 8-file+(i-1)*8) {
+                        if (set_target(game->board[rank+file], &game->board[rank+file+i*7])) {
+                            state--;
+                        }
                     } else {
-                        state -= 1;
+                        state--;
                     }
                 }
                 if (CHECK_BIT(state, 1)) {
-                    if (i*9 <= 8-file+(i)*8 && game->board[rank+file+i*9] == '0') {
-                        game->board[rank+file+i*9] = '@';
+                    if (i*9 < 8-file+(i)*8) {
+                        if (set_target(game->board[rank+file], &game->board[rank+file+i*9])) {
+                            state -= 2;    
+                        }
                     } else {
                         state -= 2;
                     }
                 }
                 if (CHECK_BIT(state, 2)) {
-                    if (-i*7 <= -(file%8)-(i-1)*8 && rank+file-i*7 > -1 && game->board[rank+file-i*7] == '0') {
-                        game->board[rank+file-i*7] = '@';
+                    if (-i*7 < -(file%8)-(i-1)*8 && rank+file-i*7 > -1) {
+                        if (set_target(game->board[rank+file], &game->board[rank+file-i*7])) {
+                            state -= 4;
+                        }
                     } else {
                         state -= 4;
                     }
                 }    
                 
                 if (CHECK_BIT(state, 3)) {
-                    if (-i*9 >= -(file%8)-(i)*8 && game->board[rank+file-i*9] == '0') {
-                        game->board[rank+file-i*9] = '@';
-                    } else {
-                        state -= 8;
+                    if ((-i*9 >= -(file%8)-(i)*8)) {
+                        if (set_target(game->board[rank+file], &game->board[rank+file-i*9])) {
+                            state -= 8;
+                        }
                     }
                 }
 
@@ -343,20 +406,12 @@ void show_valid_moves(struct Game* game, char* piece_location) {
                 if (KING_OFFSETS[i] >= -(file%8)+KING_MULTIPLIER_CALC(i) &&
                         KING_OFFSETS[i] < 8-file+KING_MULTIPLIER_CALC(i) && 
                         rank+file+KING_OFFSETS[i] < 64) {
-                    if (game->board[rank+file+KING_OFFSETS[i]] == '0') {
-                        game->board[rank+file+KING_OFFSETS[i]] = '@';
-                    } else {
-                        game->board[rank+file+KING_OFFSETS[i]] += 128;
-                    }
+                    set_target(game->board[rank+file], &game->board[rank+file+KING_OFFSETS[i]]);
                 }
                 if (-KING_OFFSETS[i] >= -(file%8)-KING_MULTIPLIER_CALC(i) &&
                         -KING_OFFSETS[i] < 8-file-KING_MULTIPLIER_CALC(i) &&
                         rank+file-KING_OFFSETS[i] > -1) {
-                    if (game->board[rank+file-KING_OFFSETS[i]] == '0') {
-                        game->board[rank+file-KING_OFFSETS[i]] = '@';
-                    } else {
-                        game->board[rank+file-KING_OFFSETS[i]] += 128;
-                    }
+                    set_target(game->board[rank+file], &game->board[rank+file-KING_OFFSETS[i]]);
                 }
                 
             }
@@ -368,20 +423,12 @@ void show_valid_moves(struct Game* game, char* piece_location) {
                 if (KNIGHT_OFFSETS[i] >= -(file%8)+KNIGHT_MULTIPLIER_CALC(i) &&
                         KNIGHT_OFFSETS[i] < 8-file+KNIGHT_MULTIPLIER_CALC(i) && 
                         rank+file+KNIGHT_OFFSETS[i] < 64) {
-                    if (game->board[rank+file+KNIGHT_OFFSETS[i]] == '0') {
-                        game->board[rank+file+KNIGHT_OFFSETS[i]] = '@';
-                    } else {
-                        game->board[rank+file+KNIGHT_OFFSETS[i]] += 128;
-                    }
+                    set_target(game->board[rank+file], &game->board[rank+file+KNIGHT_OFFSETS[i]]);
                 }
                 if (-KNIGHT_OFFSETS[i] >= -(file%8)-KNIGHT_MULTIPLIER_CALC(i) &&
                         -KNIGHT_OFFSETS[i] < 8-file-KNIGHT_MULTIPLIER_CALC(i) && 
                         rank+file-KNIGHT_OFFSETS[i] > -1) {
-                    if (game->board[rank+file-KNIGHT_OFFSETS[i]] == '0') {
-                        game->board[rank+file-KNIGHT_OFFSETS[i]] = '@';
-                    } else {
-                        game->board[rank+file-KNIGHT_OFFSETS[i]] += 128;
-                    }
+                    set_target(game->board[rank+file], &game->board[rank+file-KNIGHT_OFFSETS[i]]);
                 }
             }
             break;
