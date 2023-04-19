@@ -11,7 +11,7 @@ short join(char* api_key) {
 
     WINDOW* win;
     win = create_subwin("Join");
-    cJSON* json = get_request(api_key, "https://lichess.org/api/account/playing");
+    cJSON* json = http_request(api_key, "https://lichess.org/api/account/playing", NULL);
     cJSON* fail = cJSON_GetObjectItemCaseSensitive(json, "fail");
     if (fail->valueint == 1) {
         sw_error(win, "Invalid JSON!");

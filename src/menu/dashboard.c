@@ -48,7 +48,7 @@ short show_dashboard(char* api_key) {
     curs_set(0);
 
     cJSON* json;
-    json = get_request(api_key, "https://lichess.org/api/account");
+    json = http_request(api_key, "https://lichess.org/api/account", NULL);
 
     /* Error */
 

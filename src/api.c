@@ -35,7 +35,7 @@ size_t get_https_result(char* buffer, size_t size, size_t nmemb, void* userp)
 }
 
 
-cJSON* get_request(char* api_key, char* url) {
+cJSON* http_request(char* api_key, char* url, char* post) {
     CURL *curl;
     CURLcode res;
     struct curl_slist *list = NULL;
@@ -56,6 +56,11 @@ cJSON* get_request(char* api_key, char* url) {
 
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, get_https_result);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) &chunk);
+
+        /* Set postfields (if there are any) */
+        if (post != NULL) {
+            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post);
+        }
  
     
         res = curl_easy_perform(curl);
@@ -73,7 +78,6 @@ cJSON* get_request(char* api_key, char* url) {
         return cJSON_Parse("{\"fail\": 1}");
     }
 }
-
 
 
 size_t parse_game_stream(char* buffer, size_t size, size_t nmemb, void* userp)
@@ -132,7 +136,7 @@ size_t parse_game_stream(char* buffer, size_t size, size_t nmemb, void* userp)
             }
         }
 
-        cJSON* account = get_request(game->api_key, "https://lichess.org/api/account");
+        cJSON* account = http_request(game->api_key, "https://lichess.org/api/account", NULL);
         cJSON* username = cJSON_GetObjectItemCaseSensitive(account, "username");
 
         if (strcmp(game->black_name, username->valuestring) == 0) {
