@@ -22,7 +22,7 @@ void report(char* message) {
     char* word = strtok(msg_copy, " ");
 
     while (word != NULL) {
-        if ((strlen(word) + msg_len) > (win_w - 32)) {
+        if ((strlen(word) + msg_len) > (win_w - 33)) {
             move(10, 21);
             msg_len = 0;
         }
@@ -154,6 +154,16 @@ void game_stream(char* api_key, char* game_id) {
             /* Handle change */
             show_board(&game, 1, 1);
             refresh();
+
+            /* Visible/audible notification */
+            #ifdef USE_BEEP
+                beep();
+            #endif
+
+            #ifdef USE_FLASH
+                flash();
+            #endif
+
 
             game.change_flag = 0;
         }
