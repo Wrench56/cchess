@@ -25,13 +25,28 @@ then
     fi
 elif [ $2 = 4 ]
 then
-    if [ -z "$3"]
+    if [ -z "$3" ]
     then
         echo "Usage: ... <game_id>"
     else
         echo "Streaming..."
         curl -N https://lichess.org/api/board/game/stream/$3 -H "Authorization: Bearer $1" "Content-Type: application/x-www-form-urlencoded"
         echo
+    fi
+elif [ $2 = 5 ]
+then
+    if [ -z "$3" ]
+    then
+        echo "Usage: ... <*game_id> <move>"
+    else
+        if [ -z "$4" ]
+        then
+            echo "Usage: ... <game_id> <*move>"
+        else
+            echo "Posting move..."
+            curl https://lichess.org/api/board/game/$3/move/$4 -H "Authorization: Bearer $1" "Content-Type: application/x-www-form-urlencoded" -d "" -o /dev/null -s
+            echo "Move posted!"
+        fi
     fi
 else
     echo "Error: $2 is not a valid mode!"
