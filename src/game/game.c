@@ -23,7 +23,7 @@ void report(char* message) {
 
     while (word != NULL) {
         if ((strlen(word) + msg_len) > (win_w - 33)) {
-            move(10, 21);
+            move(9, 21);
             msg_len = 0;
         }
         printw(" %s", word);
@@ -38,15 +38,15 @@ void report_cleanup() {
     getmaxyx(stdscr, win_h, win_w);
 
     for (int i = 0; i < win_w; i++) {
+        mvaddch(8, 22+i, ' ');
         mvaddch(9, 22+i, ' ');
-        mvaddch(10, 22+i, ' ');
     }
 }
 
 void report_error(char* message) {
     report_cleanup();
     attron(COLOR_PAIR(5));
-    mvprintw(9, 22, "Error:");
+    mvprintw(8, 22, "Error:");
     attroff(COLOR_PAIR(5));
     report(message);
 }
@@ -54,7 +54,7 @@ void report_error(char* message) {
 void report_success(char* message) {
     report_cleanup();
     attron(COLOR_PAIR(7));
-    mvprintw(9, 22, "Success:");
+    mvprintw(8, 22, "Success:");
     attroff(COLOR_PAIR(7));
     report(message);
 }
@@ -94,7 +94,8 @@ void game_stream(char* api_key, char* game_id) {
         mvprintw(0, 2, "%s", game.black_name);
     }
     mvprintw(10, 2, "You");
-    mvprintw(7, 22, ">");
+    mvprintw(6, 22, ">");
+
     show_board(&game, 1, 1);
     refresh();
 
@@ -102,16 +103,16 @@ void game_stream(char* api_key, char* game_id) {
     timeout(1);
     char key = '\0';
     short current_pos = 0;
-    char move_inp[5];
+    char move_inp[] = "\0\0\0\0\0";
 
     while (1) {
         key = getch();
         if (key == 'q') {
             break;
         }
-        if ((key >= '0' && key <= '9') || (key >='A' && key <= 'H') || (key >= 'a' && key <= 'h')) {
+        if ((key >= '0' && key <= '9') || (key >='A' && key <= 'H') || (key >= 'a' && key <= 'h') && current_pos < 4) {
             /* New select/move via keyboard */
-            mvprintw(7, 24 + current_pos, "%c", key);
+            mvprintw(6, 24 + current_pos, "%c", key);
             move_inp[current_pos] = key;
             current_pos++;
 
@@ -120,7 +121,7 @@ void game_stream(char* api_key, char* game_id) {
             if (current_pos > 0) {
                 current_pos--;
                 move_inp[current_pos] = '\0';
-                mvprintw(7, 24 + current_pos, " ");
+                mvprintw(6, 24 + current_pos, " ");
 
                 refresh();
             }
@@ -151,7 +152,7 @@ void game_stream(char* api_key, char* game_id) {
             
         }
         if (game.change_flag >= 1) {
-            /* Handle change */
+            /* Handle chan,ge */
             show_board(&game, 1, 1);
             refresh();
 
@@ -163,7 +164,6 @@ void game_stream(char* api_key, char* game_id) {
             #ifdef USE_FLASH
                 flash();
             #endif
-
 
             game.change_flag = 0;
         }
