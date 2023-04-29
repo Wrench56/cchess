@@ -96,6 +96,12 @@ void game_stream(char* api_key, char* game_id) {
     mvprintw(10, 2, "You");
     mvprintw(6, 22, ">");
 
+    /* Taken pieces label */
+    mvprintw(1, 22, "Enemy took:");
+    mvprintw(3, 22, "You took:");
+
+    struct RemainingPieces r_pieces = get_remaining_pieces(&game);
+    print_taken_pieces(22, 2, r_pieces, game.is_black);
     show_board(&game, 1, 1);
     refresh();
 
@@ -152,7 +158,9 @@ void game_stream(char* api_key, char* game_id) {
             
         }
         if (game.change_flag >= 1) {
-            /* Handle chan,ge */
+            /* Handle change */
+            struct RemainingPieces r_pieces = get_remaining_pieces(&game);
+            print_taken_pieces(22, 2, r_pieces, game.is_black);
             show_board(&game, 1, 1);
             refresh();
 

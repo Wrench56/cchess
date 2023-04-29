@@ -16,6 +16,8 @@
 #define TARGET_SQUARE_FG_WHITE WHITE_FIGURE_COLOR
 #define TARGET_SQUARE_FG_BLACK BLACK_FIGURE_COLOR
 
+#define CHARACTER_PER_PIECE 1
+
 #if defined(USE_FIGURES) 
     #define PAWN_FIGURE "\u2659" // \u265F is sometimes an emoji
     #define KNIGHT_FIGURE "\u265E"

@@ -4,6 +4,18 @@
 #include "../settings.h"
 
 #include "game.h"
+#include "board.h"
+
+#define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
+#define BYTE_TO_BINARY(byte)  \
+  ((byte) & 0x80 ? '1' : '0'), \
+  ((byte) & 0x40 ? '1' : '0'), \
+  ((byte) & 0x20 ? '1' : '0'), \
+  ((byte) & 0x10 ? '1' : '0'), \
+  ((byte) & 0x08 ? '1' : '0'), \
+  ((byte) & 0x04 ? '1' : '0'), \
+  ((byte) & 0x02 ? '1' : '0'), \
+  ((byte) & 0x01 ? '1' : '0') 
 
 
 #define CHECK_BIT(var,pos) ((var) & (1<<(pos)))
@@ -436,4 +448,127 @@ void show_valid_moves(struct Game* game, char* piece_location) {
         default:
             break;   
     }
+}
+
+struct RemainingPieces get_remaining_pieces(struct Game* game) {
+    char piece_to_check;
+    short is_black;
+
+    struct RemainingPieces r_pieces = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+    for (short i = 0; i < 64; i++) {
+        is_black = 0;
+        piece_to_check = game->board[i];
+
+        if (piece_to_check > 'a') {
+            is_black++;
+            piece_to_check -= 32;
+        }
+
+        switch (piece_to_check) {
+            case 'P':
+                is_black ? r_pieces.black_pawns++ : r_pieces.white_pawns++;
+                break;
+            case 'B':
+                is_black ? r_pieces.black_bishops++ : r_pieces.white_bishops++;
+                break;
+            case 'N':
+                is_black ? r_pieces.black_knights++ : r_pieces.white_knights++;
+                break;
+            case 'R':
+                is_black ? r_pieces.black_rooks++ : r_pieces.white_rooks++;
+                break;
+            case 'Q':
+                is_black ? r_pieces.black_queen++ : r_pieces.white_queen++;
+                break;
+            default:
+                continue;
+        }
+    }
+
+    return r_pieces;
+}
+
+short print_taken_piece(int* wx, int* bx, int y, uint white_category, uint black_category, char* figure_string, short is_black) {
+    short diff = white_category - black_category;
+    if (diff > 0) {
+        for (short i = 0; i < diff; i++) {
+            is_black ? move(y, *wx) : move(y+2, *bx); 
+            #if (CHARACTER_PER_PIECE == 1)
+                printw("%s", figure_string);
+            #elif (CHARACTER_PER_PIECE == 2)
+                printw("%s ", figure_string);
+            #endif
+            if (is_black) {
+                *wx += CHARACTER_PER_PIECE;
+            } else {
+                *bx += CHARACTER_PER_PIECE;
+            }
+        }
+    } else if (diff < 0) {
+        for (short i = 0; i > diff; i--) {
+            is_black ? move(y+2, *bx) : move(y, *wx);
+            #if (CHARACTER_PER_PIECE == 1)
+                printw("%s", figure_string);
+            #elif (CHARACTER_PER_PIECE == 2)
+                printw("%s ", figure_string);
+            #endif
+            if (is_black) {
+                *bx += CHARACTER_PER_PIECE;
+            } else {
+                *wx += CHARACTER_PER_PIECE;
+            }
+        }
+    }
+
+    return diff;
+}
+
+
+void print_taken_pieces(int x, int y, struct RemainingPieces r_pieces, short is_black) {
+    short diff;
+    int wx;
+    int bx;
+
+    /* Cleanup */
+    int win_w;
+    int win_h;
+    getmaxyx(stdscr, win_h, win_w);
+
+    for (int i = x; i < win_w; i++) {
+        mvaddch(y, i, ' ');
+        mvaddch(y+2, i, ' ');
+    }
+
+    /* Calculate where the pieces should start because of +x label */
+    diff = (r_pieces.white_queen*9 + r_pieces.white_rooks*5 + r_pieces.white_bishops*3 + r_pieces.white_knights*3 + r_pieces.white_pawns) -
+    (r_pieces.black_queen*9 + r_pieces.black_rooks*5 + r_pieces.black_bishops*3 + r_pieces.black_knights*3 + r_pieces.black_pawns);
+
+    if (diff == 0) {
+        wx = bx = x;
+    } else if ((diff < 0 && diff > -10) || (diff > 0 && diff < 10)) {
+        wx = bx = x + 3;
+    } else {
+        wx = bx = x + 4;
+    }
+
+    diff = 0;
+
+    diff += print_taken_piece(&wx, &bx, y, r_pieces.white_queen, r_pieces.black_queen, QUEEN_FIGURE, is_black) * 9;
+    diff += print_taken_piece(&wx, &bx, y, r_pieces.white_rooks, r_pieces.black_rooks, ROOK_FIGURE, is_black) * 5;
+    diff += print_taken_piece(&wx, &bx, y, r_pieces.white_bishops, r_pieces.black_bishops, BISHOP_FIGURE, is_black) * 3;
+    diff += print_taken_piece(&wx, &bx, y, r_pieces.white_knights, r_pieces.black_knights, KNIGHT_FIGURE, is_black) * 3;
+    diff += print_taken_piece(&wx, &bx, y, r_pieces.white_pawns, r_pieces.black_pawns, PAWN_FIGURE, is_black);
+
+    /* +x label */
+    if (diff > 0) {
+        is_black ? move(y, x), attron(COLOR_PAIR(7)) : move(y+2, x), attron(COLOR_PAIR(5));
+        printw("+%i", diff);
+    } else if (diff < 0) {
+        is_black ? move(y+2, x), attron(COLOR_PAIR(5)) : move(y, x), attron(COLOR_PAIR(7));
+        printw("+%i", diff * -1);
+    }
+
+    attroff(COLOR_PAIR(5));
+    attroff(COLOR_PAIR(7));
 }
