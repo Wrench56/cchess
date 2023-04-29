@@ -26,7 +26,12 @@
     #define QUEEN_FIGURE "\u265B"
     #define KING_FIGURE "\u265A"
 
-    #define FIGURE_STRING(i) (i == 7 ? "%s " : "%s ")
+    #if (CHARACTER_PER_PIECE == 1)
+        #define FIGURE_STRING(i) (i == 7 ? "%s " : "%s ")
+    #else
+        #define FIGURE_STRING(i) (i == 7 ? "%s" : "%s ")
+    #endif
+
 #else
     #define PAWN_FIGURE "P"
     #define KNIGHT_FIGURE "N"
@@ -49,7 +54,7 @@
     #define POSSIBLE_MOVE_FORMAT " %s"
 
 #else
-    #define BLITZ_SYMBO,L ""
+    #define BLITZ_SYMBOL ""
     #define BULLET_SYMBOL ""
     #define CORRESPONDENCE_SYMBOL ""
     #define CLASSICAL_SYMBOL ""
