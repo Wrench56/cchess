@@ -96,6 +96,7 @@ void game_stream(char* api_key, char* game_id) {
     /* Set default values */
     game.is_black = 2;
     game.change_flag = 0;
+    game.num_moves = 0;
 
     struct Message message;
     game.message = &message;
@@ -107,6 +108,10 @@ void game_stream(char* api_key, char* game_id) {
     /* Setup UI */
     clear();
     refresh();
+
+    int win_w;
+    int win_h;
+    getmaxyx(stdscr, win_h, win_w);
 
     while (game.is_black == 2) // block until data arrives
 
@@ -131,15 +136,12 @@ void game_stream(char* api_key, char* game_id) {
     timeout(1);
     char key = '\0';
     short current_pos = 0;
-    char move_inp[] = "\0\0\0\0\0";
+    char move_inp[] = "\0\0\0\0\0\0\0";
 
     while (1) {
         key = getch();
-        if (key == 'q') {
-            break;
-        }
-        if ((key >= '0' && key <= '9') || (key >='A' && key <= 'H') || (key >= 'a' && key <= 'h') && current_pos < 4) {
-            /* New select/move via keyboard */
+        if (key > ' ' && key < 'z' && current_pos < 6) {
+            /* New command via keyboard */
             mvprintw(6, 24 + current_pos, "%c", key);
             move_inp[current_pos] = key;
             current_pos++;
@@ -154,12 +156,12 @@ void game_stream(char* api_key, char* game_id) {
                 refresh();
             }
         } else if (key == '\n') {
-            if (strlen(move_inp) == 2) { // Select
+            if (strlen(move_inp) == 2 && valid_square(move_inp)) { // Select
                 show_valid_moves(&game, move_inp);
                 show_board(&game, 1, 1);
                 refresh();
 
-            } else if (strlen(move_inp) == 4) { // Move
+            } else if (strlen(move_inp) == 4 && valid_square(move_inp)) { // Move
                 char joined_url[54] = "https://lichess.org/api/board/game/";
                 strcat(joined_url, game.game_id);
                 strcat(joined_url, "/move/");
@@ -173,9 +175,64 @@ void game_stream(char* api_key, char* game_id) {
                 } else {
                     report_success("Piece moved!");
                 }
+
+                /* Cleanup */
+                cJSON_Delete(returned);
+
+            } else if (strcmp(move_inp, "quit") == 0 || strcmp(move_inp, "exit") == 0) {
+                break;
+            } else if (strcmp(move_inp, "?") == 0 || strcmp(move_inp, "help") == 0) {
+                WINDOW *win = newwin(win_h, win_w, 0, 0);
+                refresh();
+
+                box(win, 0, 0);
+                mvwprintw(win, 0, 3, " Help ");
+
+                mvwprintw(win, 1, 2, "quit/exit - Leave");
+                mvwprintw(win, 2, 2, "help/?    - Help");
+                mvwprintw(win, 3, 2, "draw      - Accept or offer draw");
+                mvwprintw(win, 4, 2, "nodraw    - Decline draw");
+                mvwprintw(win, 5, 2, "glhf      - Send GLHF message");
+                wrefresh(win);
+
+                while (getch() != 'q');
+                delwin(win);
+
+                touchwin(stdscr);
+                wrefresh(stdscr);
+            } else if (strcmp(move_inp, "draw") == 0 || strcmp(move_inp, "nodraw") == 0) {
+                short accept = 0;
+                if (strcmp(move_inp, "draw") == 0) {
+                    accept = 1;
+                }
                 
+                char joined_url[54] = "https://lichess.org/api/board/game/";
+                strcat(joined_url, game.game_id);
+                if (accept) {
+                    strcat(joined_url, "/draw/true");
+                } else {
+                    strcat(joined_url, "/draw/false");
+                }
+                
+
+                cJSON* returned = http_request(game.api_key, joined_url, "");
+                cJSON* ok = cJSON_GetObjectItemCaseSensitive(returned, "ok");
+                if (ok == NULL) {
+                    cJSON* error = cJSON_GetObjectItemCaseSensitive(returned, "error");
+                    report_error(error->valuestring);
+                } else {
+                    if (accept) {
+                        report_success("Draw offer sent or accepted!");
+                    } else {
+                        report_success("Draw offer declined!");
+                    }
+                }
+
+                /* Cleanup */
+                cJSON_Delete(returned);
+
             } else { // Error
-                report_error("Invalid move/select!");
+                report_error("Invalid command!");
             }
             
         }
@@ -201,6 +258,28 @@ void game_stream(char* api_key, char* game_id) {
 
             report_message(message.username, message.text);
             game.change_flag = 0;
+        } else if (game.change_flag == 3)  {
+            /* Game ends */
+
+            WINDOW *win = newwin(win_h-4, win_w-4, 2, 2);
+            refresh();
+
+            box(win, 0, 0);
+            mvwprintw(win, 0, 3, " Game Over ");
+
+            if (strcmp(game.winner, "draw") == 0) {
+                mvwprintw(win, 1, 1, " Game ended in draw!");
+            } else {
+                mvwprintw(win, 1, 1, "The winner is: ");
+                mvwprintw(win, 2, 2, "%s", game.winner);
+            }
+            wrefresh(win);
+            game.change_flag = 0;
+
+            while (getch() != 'q');
+            delwin(win);
+
+            break;
         }
     }
 

@@ -21,3 +21,5 @@ void show_valid_moves(struct Game* game, char* piece_location);
 
 struct RemainingPieces get_remaining_pieces(struct Game* game);
 void print_taken_pieces(int x, int y, struct RemainingPieces r_pieces, short is_black);
+
+short valid_square(char* string);

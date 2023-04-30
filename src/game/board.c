@@ -572,3 +572,17 @@ void print_taken_pieces(int x, int y, struct RemainingPieces r_pieces, short is_
     attroff(COLOR_PAIR(5));
     attroff(COLOR_PAIR(7));
 }
+
+short valid_square(char* string) {
+    short i = 0;
+    char chr = string[i];
+    while (chr != '\0') {
+        if (!((chr > '0' && chr < '9') || (chr >= 'A' && chr < 'I') || (chr >= 'a' && chr < 'i'))) {
+            return 0;
+        }
+        i++;
+        chr = string[i];
+    }
+
+    return 1;
+}

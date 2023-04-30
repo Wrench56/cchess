@@ -11,6 +11,7 @@ struct Game {
     char board[65];
     char white_name[32];
     char black_name[32];
+    char winner[32];
     short is_black;
     unsigned int num_moves;
     unsigned short change_flag;

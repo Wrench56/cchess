@@ -101,11 +101,27 @@ size_t parse_game_stream(char* buffer, size_t size, size_t nmemb, void* userp)
     cJSON* type = cJSON_GetObjectItemCaseSensitive(json, "type");
     
     if (strcmp(type->valuestring, "gameState") == 0) {
+        cJSON* status = cJSON_GetObjectItemCaseSensitive(json, "status");
+        if (strcmp(status->valuestring, "resign") == 0) {
+            game->change_flag = 3;
+            cJSON* winner = cJSON_GetObjectItemCaseSensitive(json, "winner");
+            strcpy(game->winner, winner->valuestring);
+
+            return realsize;
+        } else if (strcmp(status->valuestring, "draw") == 0) {
+            game->change_flag = 3;
+            strcpy(game->winner, "draw");
+
+            return realsize;
+        }
+
         cJSON* moves = cJSON_GetObjectItemCaseSensitive(json, "moves");
 
-        parse_move(game, moves->valuestring  + strlen(moves->valuestring) - 4);
-        game->num_moves++;
-        game->change_flag = 1;
+        if (strlen(moves->valuestring) != ((game->num_moves-1) + (game->num_moves*4))) {
+            parse_move(game, moves->valuestring  + strlen(moves->valuestring) - 4);
+            game->num_moves++;
+            game->change_flag = 1;
+        }
 
     } else if (strcmp(type->valuestring, "opponentGone") == 0) {
 
