@@ -8,27 +8,29 @@
 #include "board.h"
 #include "game.h"
 
-void report(char* message) {
+void report(char* message, uint padding) {
     int win_w;
     int win_h;
     getmaxyx(stdscr, win_h, win_w);
 
-    int msg_len = 0;
+    int msg_len = padding;
+    short new_line = 0;
 
     /* Support string literals for strtok() */
     char *msg_copy = (char *)malloc(strlen(message) + 1);
     strcpy(msg_copy, message);
-
     char* word = strtok(msg_copy, " ");
 
     while (word != NULL) {
-        if ((strlen(word) + msg_len) > (win_w - 33)) {
-            move(9, 21);
+        if (((strlen(word) + msg_len) > (win_w - 22)) && (new_line < win_h - 9)) {
+            move(9 + new_line, 21);
             msg_len = 0;
+            new_line++;
         }
         printw(" %s", word);
-        msg_len += strlen(word);
+        msg_len += strlen(word) + 1;
         word = strtok(NULL, " ");
+        
     }
 }
 
@@ -40,6 +42,7 @@ void report_cleanup() {
     for (int i = 0; i < win_w; i++) {
         mvaddch(8, 22+i, ' ');
         mvaddch(9, 22+i, ' ');
+        mvaddch(10, 22+i, ' ');
     }
 }
 
@@ -48,7 +51,7 @@ void report_error(char* message) {
     attron(COLOR_PAIR(5));
     mvprintw(8, 22, "Error:");
     attroff(COLOR_PAIR(5));
-    report(message);
+    report(message, 6);
 }
 
 void report_success(char* message) {
@@ -56,7 +59,23 @@ void report_success(char* message) {
     attron(COLOR_PAIR(7));
     mvprintw(8, 22, "Success:");
     attroff(COLOR_PAIR(7));
-    report(message);
+    report(message, 8);
+}
+
+void report_message(char* username, char* message) {
+    report_cleanup();
+    attron(COLOR_PAIR(6));
+    if (strlen(username) > 14) {
+        username[14] = '.';
+        username[15] = '\0';
+    }
+    mvprintw(8, 22, "%s:", username);
+    attroff(COLOR_PAIR(6));
+    if (strlen(message) > 60) {
+        message[57] = message[58] = message[59] = '.';
+        message[60] = '\0';
+    }
+    report(message, strlen(username) + 1);
 }
 
 /* API thread */
@@ -77,6 +96,9 @@ void game_stream(char* api_key, char* game_id) {
     /* Set default values */
     game.is_black = 2;
     game.change_flag = 0;
+
+    struct Message message;
+    game.message = &message;
 
     /* Set starting board */
     strcpy(game.board, "rnbqkbnrpppppppp00000000000000000000000000000000PPPPPPPPRNBQKBNR");
@@ -157,8 +179,8 @@ void game_stream(char* api_key, char* game_id) {
             }
             
         }
-        if (game.change_flag >= 1) {
-            /* Handle change */
+        if (game.change_flag == 1) {
+            /* Update board */
             struct RemainingPieces r_pieces = get_remaining_pieces(&game);
             print_taken_pieces(22, 2, r_pieces, game.is_black);
             show_board(&game, 1, 1);
@@ -173,6 +195,11 @@ void game_stream(char* api_key, char* game_id) {
                 flash();
             #endif
 
+            game.change_flag = 0;
+        } else if (game.change_flag == 2) {
+            /* Incoming message */
+
+            report_message(message.username, message.text);
             game.change_flag = 0;
         }
     }

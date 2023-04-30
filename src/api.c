@@ -87,7 +87,7 @@ size_t parse_game_stream(char* buffer, size_t size, size_t nmemb, void* userp)
     size_t realsize = size * nmemb;
     char data[realsize + 1];
     memcpy(data, buffer, realsize);
-    if (strlen(data) < 8) { // Check for keep-alive (anomaly: message with a length of 6 bytes?)
+    if (strlen(data) < 10) { // Check for keep-alive (anomaly: message with a length of 6 bytes?)
         return realsize;
     }
 
@@ -105,7 +105,7 @@ size_t parse_game_stream(char* buffer, size_t size, size_t nmemb, void* userp)
 
         parse_move(game, moves->valuestring  + strlen(moves->valuestring) - 4);
         game->num_moves++;
-        game->change_flag++;
+        game->change_flag = 1;
 
     } else if (strcmp(type->valuestring, "opponentGone") == 0) {
 
@@ -145,8 +145,18 @@ size_t parse_game_stream(char* buffer, size_t size, size_t nmemb, void* userp)
             game->is_black = 0;
         }
 
-    } else { // chatLine
+    } else if (strcmp(type->valuestring, "chatLine") == 0) { // chatLine
+        cJSON* uname = cJSON_GetObjectItemCaseSensitive(json, "username");
+        cJSON* text = cJSON_GetObjectItemCaseSensitive(json, "text");
 
+        if (strcmp(uname->valuestring, "lichess") == 0) {
+            strcpy(game->message->username, "[SYSTEM]");
+        } else {
+            strcpy(game->message->username, uname->valuestring);
+        }
+        strcpy(game->message->text, text->valuestring);
+
+        game->change_flag = 2;
     }
 
     return realsize;
@@ -155,7 +165,6 @@ size_t parse_game_stream(char* buffer, size_t size, size_t nmemb, void* userp)
 
 void read_game_stream(void* game_struct_ptr) {
     CURL *curl;
-    CURLcode res;
     struct curl_slist *list = NULL;
     struct Game *game = (struct Game*)game_struct_ptr;
 
@@ -173,7 +182,7 @@ void read_game_stream(void* game_struct_ptr) {
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) game);
  
     
-        res = curl_easy_perform(curl);
+        curl_easy_perform(curl);
 
         /* always cleanup */
         curl_slist_free_all(list);
