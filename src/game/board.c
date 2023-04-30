@@ -562,7 +562,7 @@ void print_taken_pieces(int x, int y, struct RemainingPieces r_pieces, short is_
 
     /* +x label */
     if (diff > 0) {
-        is_black ? move(y, x), attron(COLOR_PAIR(7)) : move(y+2, x), attron(COLOR_PAIR(5));
+        is_black ? move(y, x), attron(COLOR_PAIR(5)) : move(y+2, x), attron(COLOR_PAIR(7));
         printw("+%i", diff);
     } else if (diff < 0) {
         is_black ? move(y+2, x), attron(COLOR_PAIR(5)) : move(y, x), attron(COLOR_PAIR(7));
