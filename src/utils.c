@@ -11,19 +11,3 @@ WINDOW* create_subwin(char* title) {
 
     return win;
 }
-
-void sw_error(WINDOW* win, char* message) {
-    /* Report error */
-    wattron(win, COLOR_PAIR(5));
-    mvwprintw(win, 9, 1, "Error: ");
-    wattroff(win, COLOR_PAIR(5));
-    printw("%s", message);
-}
-
-void sw_warning(WINDOW* win, char* message) {
-    /* Report error */
-    wattron(win, COLOR_PAIR(8));
-    mvwprintw(win, 9, 1, "Warning: ");
-    wattroff(win, COLOR_PAIR(8));
-    printw("%s", message);
-}
