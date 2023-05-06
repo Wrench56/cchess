@@ -2,8 +2,8 @@
 #include <ncurses.h>
 
 #include "../api.h"
+#include "../utils.h"
 
-#include "utils.h"
 #include "game.h"
 
 short join(char* api_key) {

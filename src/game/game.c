@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include "../api.h"
+#include "../utils.h"
 
 #include "board.h"
 #include "game.h"
@@ -182,11 +183,7 @@ void game_stream(char* api_key, char* game_id) {
             } else if (strcmp(move_inp, "quit") == 0 || strcmp(move_inp, "exit") == 0) {
                 break;
             } else if (strcmp(move_inp, "?") == 0 || strcmp(move_inp, "help") == 0) {
-                WINDOW *win = newwin(win_h, win_w, 0, 0);
-                refresh();
-
-                box(win, 0, 0);
-                mvwprintw(win, 0, 3, " Help ");
+                WINDOW* win = create_subwin("Help");
 
                 mvwprintw(win, 1, 2, "quit/exit - Leave");
                 mvwprintw(win, 2, 2, "help/?    - Help");
@@ -261,17 +258,12 @@ void game_stream(char* api_key, char* game_id) {
         } else if (game.change_flag == 3)  {
             /* Game ends */
 
-            WINDOW *win = newwin(win_h-4, win_w-4, 2, 2);
-            refresh();
-
-            box(win, 0, 0);
-            mvwprintw(win, 0, 3, " Game Over ");
-
+            WINDOW* win = create_subwin("Game Over");
             if (strcmp(game.winner, "draw") == 0) {
-                mvwprintw(win, 1, 1, " Game ended in draw!");
+                mvwprintw(win, 2, 4, " Game ended in a draw!");
             } else {
-                mvwprintw(win, 1, 1, "The winner is: ");
-                mvwprintw(win, 2, 2, "%s", game.winner);
+                mvwprintw(win, 2, 4, "The winner is: ");
+                mvwprintw(win, 3, 5, "%s", game.winner);
             }
             wrefresh(win);
             game.change_flag = 0;
