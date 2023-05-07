@@ -174,6 +174,7 @@ short show_dashboard(char* api_key) {
             mvwprintw(win, 4, 2, "q - Quit");
             mvwprintw(win, 5, 2, "-- Menu specials --");
             mvwprintw(win, 6, 2, "@ - .autologin user");
+            mvwprintw(win, 7, 2, "r - force refresh");
             wrefresh(win);
 
             while (getch() != 'q');
@@ -196,6 +197,8 @@ short show_dashboard(char* api_key) {
             }
             curs_set(0);
             mvprintw(10, 1, "                       ");
+        } else if (key == 'r') {
+            return 0;
         }
     }
 
