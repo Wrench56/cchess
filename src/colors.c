@@ -26,4 +26,8 @@ void init_colors() {
     /* Target squares */
     init_pair(13, TARGET_SQUARE_FG_WHITE, TARGET_SQUARE_BACKGROUND);
     init_pair(15, TARGET_SQUARE_FG_WHITE, TARGET_SQUARE_BACKGROUND);
+
+    /* Winner sign */
+    init_pair(17, WHITE_FIGURE_COLOR, -1);
+    init_pair(18, BLACK_FIGURE_COLOR, -1);
 }

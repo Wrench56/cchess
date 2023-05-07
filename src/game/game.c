@@ -260,10 +260,21 @@ void game_stream(char* api_key, char* game_id) {
 
             WINDOW* win = create_subwin("Game Over");
             if (strcmp(game.winner, "draw") == 0) {
+                attron(COLOR_PAIR(6));
                 mvwprintw(win, 2, 4, " Game ended in a draw!");
+                attroff(COLOR_PAIR(6));
             } else {
                 mvwprintw(win, 2, 4, "The winner is: ");
-                mvwprintw(win, 3, 5, "%s", game.winner);
+                if (game.winner[0] == 'w') {
+                    attron(COLOR_PAIR(17));
+                    mvwprintw(win, 3, 5, "white");
+                    attroff(COLOR_PAIR(17));
+                } else {
+                    attron(COLOR_PAIR(18));
+                    mvwprintw(win, 3, 5, "black");
+                    attroff(COLOR_PAIR(18));
+                }
+                    
             }
             wrefresh(win);
             game.change_flag = 0;
